@@ -1,2 +1,2 @@
-# crystal-plugin-template
-Paper plugin template using Crystal modules
+# NPCGuides
+Плагин, написанный для платформы Paper или её форков

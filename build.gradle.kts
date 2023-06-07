@@ -1,3 +1,5 @@
+import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
+
 plugins {
     id("java")
     id("xyz.jpenilla.run-paper") version "2.0.1"
@@ -11,10 +13,12 @@ repositories {
     mavenCentral()
     maven("https://papermc.io/repo/repository/maven-public/")
     maven("https://the-planet.fun/repo/snapshots/")
+    maven("https://repo.citizensnpcs.co/")
 }
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
+    compileOnly("net.citizensnpcs:citizens-main:2.0.31-SNAPSHOT")
 
     val crystalVersion = "2.0.0-SNAPSHOT"
     library("me.denarydev.crystal.paper:utils:$crystalVersion")
@@ -28,42 +32,36 @@ java {
 }
 
 paper {
-    main = "me.example.plugin.ExamplePlugin"
-    loader = "me.example.plugin.PluginLibrariesLoader"
+    main = "me.denarydev.npcguldes.NPCGuidesPlugin"
+    loader = "me.denarydev.npcguldes.PluginLibrariesLoader"
     generateLibrariesJson = true
     author = "Me"
     apiVersion = "1.19"
-    //defaultPermission = Default.OP
+    defaultPermission = BukkitPluginDescription.Permission.Default.OP
 
-    //depends {
-    //    register("FirstPlugin") {
-    //        required = true
-    //        bootstrap = false
-    //    }
-    //    register("SecondPlugin")
-    //}
+    depends {
+        register("Citizens")
+    }
 
-    //loadBefore {
-    //    register("FirstPlugin")
-    //}
+    loadAfter {
+        register("Citizens")
+    }
 
-    //loadAfter {
-    //    register("SecondPlugin")
-    //}
-
-    //permissions {
-    //    register("exampleplugin.admin") {
-    //        description = "Admin permission"
-    //        default = Default.FALSE
-    //        children = listOf("exampleplugin.reload", "exampleplugin.use")
-    //    }
-    //    register("exampleplugin.reload") {
-    //        description = "Allows to reload plugin"
-    //    }
-    //    register("exampleplugin.use") {
-    //        description = "Allows to use plugin features"
-    //    }
-    //}
+    permissions {
+        register("npcguldes.admin") {
+            description = "Admin permission"
+            default = BukkitPluginDescription.Permission.Default.FALSE
+            children = listOf("npcguldes.reload", "npcguldes.use")
+        }
+        register("npcguldes.reload") {
+            description = "Allows to reload plugin"
+            default = BukkitPluginDescription.Permission.Default.OP
+        }
+        register("npcguldes.use") {
+            description = "Allows to use plugin features"
+            default = BukkitPluginDescription.Permission.Default.TRUE
+        }
+    }
 }
 
 tasks {

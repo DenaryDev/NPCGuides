@@ -1,8 +1,8 @@
-package me.example.plugin;
+package me.denarydev.npcguides;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class ExamplePlugin extends JavaPlugin {
+public class NPCGuidesPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
