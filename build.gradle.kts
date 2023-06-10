@@ -1,7 +1,8 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
 plugins {
-    id("java")
+    java
+    kotlin("jvm") version "1.8.21"
     id("xyz.jpenilla.run-paper") version "2.0.1"
     id("net.minecrell.plugin-yml.paper") version "0.6.0-SNAPSHOT"
 }
@@ -13,27 +14,35 @@ repositories {
     mavenCentral()
     maven("https://papermc.io/repo/repository/maven-public/")
     maven("https://the-planet.fun/repo/snapshots/")
-    maven("https://repo.citizensnpcs.co/")
+    maven("https://maven.citizensnpcs.co/repo/")
+    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
 }
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
-    compileOnly("net.citizensnpcs:citizens-main:2.0.31-SNAPSHOT")
+    compileOnly("net.citizensnpcs:citizensapi:2.0.31-SNAPSHOT")
+    compileOnly("me.clip:placeholderapi:2.11.3")
+
+    library(kotlin("stdlib"))
+
+    library("org.spongepowered:configurate-extra-kotlin:4.1.2")
 
     val crystalVersion = "2.0.0-SNAPSHOT"
-    library("me.denarydev.crystal.paper:utils:$crystalVersion")
     library("me.denarydev.crystal.shared:config:$crystalVersion")
+    library("me.denarydev.crystal.shared:database:$crystalVersion")
 }
 
 java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
+
+kotlin {
+    jvmToolchain(17)
 }
 
 paper {
-    main = "me.denarydev.npcguldes.NPCGuidesPlugin"
-    loader = "me.denarydev.npcguldes.PluginLibrariesLoader"
+    main = "me.denarydev.npcguides.NPCGuidesPlugin"
+    loader = "me.denarydev.npcguides.internal.PluginLibrariesLoader"
     generateLibrariesJson = true
     author = "Me"
     apiVersion = "1.19"
@@ -48,16 +57,16 @@ paper {
     }
 
     permissions {
-        register("npcguldes.admin") {
+        register("npcguides.admin") {
             description = "Admin permission"
             default = BukkitPluginDescription.Permission.Default.FALSE
-            children = listOf("npcguldes.reload", "npcguldes.use")
+            children = listOf("npcguides.reload", "npcguides.use")
         }
-        register("npcguldes.reload") {
+        register("npcguides.reload") {
             description = "Allows to reload plugin"
             default = BukkitPluginDescription.Permission.Default.OP
         }
-        register("npcguldes.use") {
+        register("npcguides.use") {
             description = "Allows to use plugin features"
             default = BukkitPluginDescription.Permission.Default.TRUE
         }
@@ -65,20 +74,6 @@ paper {
 }
 
 tasks {
-    compileJava {
-        options.encoding = Charsets.UTF_8.name()
-        options.compilerArgs.addAll(
-            listOf(
-                "-parameters",
-                "-nowarn",
-                "-Xlint:-unchecked",
-                "-Xlint:-deprecation",
-                "-Xlint:-processing"
-            )
-        )
-        options.isFork = true
-    }
-
     processResources {
         filteringCharset = Charsets.UTF_8.name()
     }
