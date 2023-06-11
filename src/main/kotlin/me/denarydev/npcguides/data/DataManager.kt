@@ -66,6 +66,21 @@ class DataManager : AbstractDataManager() {
         if (databaseConnector != null) databaseConnector.closeConnection()
     }
 
+    fun resetPlayer(uuid: UUID) {
+        databaseConnector.connection.use {
+            val statement = it.prepareStatement("update `$table` set `guides` = null where `uuid` = '$uuid'")
+            statement.executeUpdate()
+        }
+    }
+
+    fun exists(uuid: UUID): Boolean {
+        databaseConnector.connection.use {
+            val statement = it.prepareStatement("select `name` from `$table` where `uuid` = '$uuid';")
+            val result = statement.executeQuery()
+            return result.next()
+        }
+    }
+
     private fun getPlayerTalks(player: Player): MutableMap<String, Int> {
         debug("Getting ${player.name} talks from database...")
         databaseConnector.connection.use {
@@ -100,17 +115,9 @@ class DataManager : AbstractDataManager() {
         }
     }
 
-    private fun exists(uuid: UUID): Boolean {
-        databaseConnector.connection.use {
-            val statement = it.prepareStatement("select `name` from `$table` where `uuid` = '$uuid';")
-            val result = statement.executeQuery()
-            return result.next()
-        }
-    }
-
     private fun savePlayer(uuid: UUID) {
         databaseConnector.connection.use {
-            val statement = it.prepareStatement("update `$table` set `guides` = '${talksAsString(uuid)}' where `uuid` = '${uuid}'")
+            val statement = it.prepareStatement("update `$table` set `guides` = ${talksAsString(uuid)} where `uuid` = '${uuid}'")
             statement.executeUpdate()
         }
     }
@@ -123,6 +130,6 @@ class DataManager : AbstractDataManager() {
             if (builder.isNotEmpty()) builder.append(";")
             builder.append(guideId).append("-").append(amount)
         }
-        return builder.toString()
+        return "'$builder'"
     }
 }

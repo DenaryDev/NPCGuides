@@ -29,8 +29,10 @@ fun loadSettings(path: Path) {
 class MainConfig {
     @Comment("Режим отладки")
     val debug: Boolean = true
+
     @Comment("Интервал появления частиц над нпс (в тиках)")
     val particlesInterval: Long = 5L
+
     @Comment("Настройки базы данных")
     val database: Database = Database()
 
@@ -38,25 +40,32 @@ class MainConfig {
     class Database {
         @Comment("Тип базы данных. Доступно: SQLITE, MYSQL")
         val type: DatabaseType = DatabaseType.MYSQL
+
         @Comment("Настройки удалённого подключения (для MySQL)")
         val remote: Remote = Remote()
-    
+
         @ConfigSerializable
         class Remote {
             @Comment("Настройки адреса бд")
             val connection: Connection = Connection()
+
             @Comment("Пользователь, используемый для подключения к бд")
             val credentials: Credentials = Credentials()
+
             @Comment("Основные параметры подключения")
             val settings: Settings = Settings()
-            @Comment("Дополнительные параметры, которые вы можете использовать.")
+
+            @Comment(
+                """Дополнительные параметры, которые вы можете использовать.
+Можно добавить следующие параметры:
+  useSSL = false
+  verifyServerCertificate = false"""
+            )
             val properties: MutableMap<String, String> = mutableMapOf(
                 "useUnicode" to "true",
-                "characterEncoding" to "utf8",
-                "useSSL" to "false",
-                "verifyServerCertificate" to "false"
+                "characterEncoding" to "utf8"
             )
-        
+
             @ConfigSerializable
             class Connection {
                 @Comment("Адрес удалённого сервера")
@@ -117,22 +126,24 @@ class MainConfig {
 }
 
 @ConfigSerializable
-class GuidesConfig(
+class GuidesConfig {
     val guides: List<Guide> = listOf(Guide())
-)
+}
 
 @ConfigSerializable
 class MessagesConfig {
     @Comment("Сообщения о различных ошибках")
     val errors: Errors = Errors()
+
     @Comment("Сообщения для команд")
     val commands: Commands = Commands()
 
     @ConfigSerializable
     class Errors {
-        val notFound: String = "<red>Игрок %argument% не найден."
+        val notFound: String = "<red>Игрок <arg> не найден."
         val playersOnly: String = "<red>Эту команду могут использовать только игроки."
         val noPerm: String = "<red>У вас недостаточно прав, чтобы использовать эту команду."
+        val noData: String = "<red>Данные о игроке не найдены"
     }
 
     @ConfigSerializable
@@ -141,32 +152,38 @@ class MessagesConfig {
         val help: Help = Help()
         val reset: Reset = Reset()
         val reload: Reload = Reload()
-    
+        //val info: Info = Info()
+
         @ConfigSerializable
         class Guides {
-            val usage: String = "<red>Использование: /<label> <help|reload|reset> [player|all]"
+            val usage: String = "<red>Используйте /<label> help для просмотра списка доступных команд"
         }
 
         @ConfigSerializable
         class Help {
-            val header: String = "<yellow>Помощь по команде /<label>:"
-            val entry: String = "<dark_gray><b>*</b> <gold><usage> <gray>- <yellow><info><reset>"
+            val header: String = "<rainbow><b>NPCGuides</b></rainbow> <yellow>доступные команды:"
+            val entry: String = "<dark_gray><b>*</b> <gold>/<label> <args> <gray>- <yellow><info><reset>"
         }
 
         @ConfigSerializable
         class Reset {
             val info: String = "<i>Удаляет данные игрока или всех игроков"
             val usage: String = "<red>Использование: /<label> reset [player|all]"
-            val yourself: String = "<green>Ваши данные были удалены из базы данных, вы можете снова проходить гайды."
+            val target: String = "<green>Ваши данные были удалены из базы данных, вы можете снова проходить гайды."
             val all: String = "<green>Данные всех игроков удалены из базы данных, они могут снова проходить гайды."
-            val player: String = "<green>Данные игрока %player_name% удалены, он может снова проходить гайды."
+            val sender: String = "<green>Данные игрока <name> удалены, он может снова проходить гайды."
         }
 
         @ConfigSerializable
         class Reload {
             val info: String = "<i>Перезагружает конфигурацию плагина"
-            val usage: String = "<red>Использование: /<label> reload"
             val reloaded: String = "<green>Конфигурация плагина успешно перезагружена."
         }
+
+        //@ConfigSerializable
+        //class Info {
+        //    val info: String = "<i>Получает информацию о гайде"
+        //    val usage: String = "<red>Использование: /<label> info [player]"
+        //}
     }
 }

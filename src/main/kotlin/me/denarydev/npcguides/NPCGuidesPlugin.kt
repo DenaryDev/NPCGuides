@@ -7,6 +7,7 @@
  */
 package me.denarydev.npcguides
 
+import me.denarydev.npcguides.command.GuidesCommand
 import me.denarydev.npcguides.data.DataManager
 import me.denarydev.npcguides.data.dataManager
 import me.denarydev.npcguides.guide.GuideManager
@@ -17,6 +18,7 @@ import me.denarydev.npcguides.settings.DataConfiguration
 import me.denarydev.npcguides.settings.loadSettings
 import me.denarydev.npcguides.settings.main
 import me.denarydev.npcguides.task.ParticlesTask
+import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import org.slf4j.Logger
 
@@ -24,8 +26,6 @@ lateinit var PLUGIN: NPCGuidesPlugin
 lateinit var LOGGER: Logger
 
 class NPCGuidesPlugin : JavaPlugin() {
-
-    private lateinit var particlesTask: ParticlesTask
 
     override fun onLoad() {
         PLUGIN = this
@@ -35,20 +35,16 @@ class NPCGuidesPlugin : JavaPlugin() {
     override fun onEnable() {
         dataManager = DataManager()
         guideManager = GuideManager()
-        particlesTask = ParticlesTask()
-        reload(true)
+        reload()
+        ParticlesTask().runTaskTimerAsynchronously(this, main.particlesInterval, main.particlesInterval)
+        Bukkit.getCommandMap().register(this.name.lowercase(), GuidesCommand())
         server.pluginManager.registerEvents(PlayerListener(), this)
         server.pluginManager.registerEvents(NPCListener(), this)
     }
 
-    fun reload(startup: Boolean = false) {
-        if (!startup) {
-            particlesTask.cancel()
-            dataManager.shutdown()
-        }
+    fun reload() {
         loadSettings(dataFolder.toPath())
         dataManager.loadDatabase(DataConfiguration())
-        particlesTask.runTaskTimerAsynchronously(this, main.particlesInterval, main.particlesInterval)
     }
 
     override fun onDisable() {

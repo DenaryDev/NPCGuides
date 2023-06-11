@@ -104,7 +104,7 @@ class PermissionAction() {
     }
 
     @Transient
-    lateinit var permission: String
+    var permission: String = ""
 
     fun permission(permission: String): PermissionAction {
         this.permission = permission

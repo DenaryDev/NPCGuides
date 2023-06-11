@@ -24,7 +24,7 @@ import org.jetbrains.annotations.ApiStatus.Internal
 class ParticlesTask : BukkitRunnable() {
     override fun run() {
         val players = Bukkit.getOnlinePlayers()
-        if (players.isEmpty()) return
+        if (players.isEmpty() || guides.guides.isEmpty()) return
 
         for (player in players) {
             for (guide in guides.guides) {
@@ -73,7 +73,7 @@ data class ChatTask(val player: Player, val guideId: String, val action: Permiss
 data class ActionsTask(val player: Player, val guideId: String, val action: PermissionAction) : BukkitRunnable() {
     override fun run() {
         action.execute.actions.forEach {
-            debug("Executing action $action for ${player.name}")
+            debug("Executing action $it for ${player.name}")
             executeAction(player, it)
             if (action.execute.sound) {
                 player.playSound(player.location, action.sound.type, action.sound.volume, action.sound.pitch)

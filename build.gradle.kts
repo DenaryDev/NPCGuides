@@ -60,16 +60,20 @@ paper {
         register("npcguides.admin") {
             description = "Admin permission"
             default = BukkitPluginDescription.Permission.Default.FALSE
-            children = listOf("npcguides.reload", "npcguides.use")
+            children = listOf("npcguides.reload", "npcguides.reset", /*"npcguides.info"*/)
         }
         register("npcguides.reload") {
             description = "Allows to reload plugin"
             default = BukkitPluginDescription.Permission.Default.OP
         }
-        register("npcguides.use") {
-            description = "Allows to use plugin features"
-            default = BukkitPluginDescription.Permission.Default.TRUE
+        register("npcguides.reset") {
+            description = "Allows to use /guides reset"
+            default = BukkitPluginDescription.Permission.Default.OP
         }
+        //register("npcguides.info") {
+        //    description = "Allows to use /guides info"
+        //    default = BukkitPluginDescription.Permission.Default.OP
+        //}
     }
 }
 
