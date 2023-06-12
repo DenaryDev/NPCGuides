@@ -70,6 +70,7 @@ class DataManager : AbstractDataManager() {
         databaseConnector.connection.use {
             val statement = it.prepareStatement("update `$table` set `guides` = null where `uuid` = '$uuid'")
             statement.executeUpdate()
+            users[uuid] = mutableMapOf()
         }
     }
 
