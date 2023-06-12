@@ -13,6 +13,7 @@ import me.denarydev.npcguides.LOGGER
 import me.denarydev.npcguides.PLUGIN
 import org.bukkit.Bukkit
 import org.slf4j.Logger
+import java.io.File
 
 class DataConfiguration : AbstractDatabaseConfig() {
     override fun logger(): Logger {
@@ -25,6 +26,10 @@ class DataConfiguration : AbstractDatabaseConfig() {
 
     override fun databaseType(): DatabaseType {
         return main.database.type
+    }
+
+    override fun sqliteStorageFile(): File {
+        return File(PLUGIN.dataFolder, "storage.db")
     }
 
     override fun sqlPoolPrefix(): String {
