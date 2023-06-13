@@ -9,8 +9,13 @@ import org.spongepowered.configurate.objectmapping.meta.Comment
 
 @ConfigSerializable
 class Guide {
-    @Comment("ID гайда, используется для хранения данных в бд")
-    val id: String = "madadm"
+
+    @Transient
+    var id: String = "madadm"
+    fun id(id: String): Guide {
+        this.id = id
+        return this
+    }
 
     @Comment("ID NPC, к которому привязан гайд")
     val npcId: Int = 0

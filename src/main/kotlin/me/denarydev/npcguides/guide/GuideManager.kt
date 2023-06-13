@@ -25,7 +25,7 @@ class GuideManager {
     private val talkingPlayers = mutableListOf<UUID>()
 
     fun byId(id: String): Guide? {
-        return guides.guides.stream()
+        return guides.stream()
             .filter { it.id == id }
             .findFirst().orElse(null)
     }
@@ -63,7 +63,7 @@ class GuideManager {
     }
 
     private fun byNPC(npcId: Int): Guide? {
-        return guides.guides.stream()
+        return guides.stream()
             .filter { it.npcId == npcId }
             .findFirst().orElse(null)
     }

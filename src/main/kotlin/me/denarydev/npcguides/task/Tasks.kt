@@ -24,13 +24,13 @@ import org.jetbrains.annotations.ApiStatus.Internal
 class ParticlesTask : BukkitRunnable() {
     override fun run() {
         val players = Bukkit.getOnlinePlayers()
-        if (players.isEmpty() || guides.guides.isEmpty()) return
+        if (players.isEmpty() || guides.isEmpty()) return
 
         for (player in players) {
-            for (guide in guides.guides) {
+            for (guide in guides) {
                 val npc = CitizensAPI.getNPCRegistry().getById(guide.npcId) ?: continue
                 val action = guideManager.getAction(player, guide)
-                ParticleTask(player, npc, action.particle).runTask(PLUGIN)
+                if (action.particle.count > 0) ParticleTask(player, npc, action.particle).runTask(PLUGIN)
             }
         }
     }

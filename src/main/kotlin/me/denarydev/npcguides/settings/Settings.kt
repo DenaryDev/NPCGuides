@@ -9,21 +9,44 @@ package me.denarydev.npcguides.settings
 
 import me.denarydev.crystal.config.CrystalConfigs
 import me.denarydev.crystal.db.DatabaseType
+import me.denarydev.npcguides.LOGGER
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Comment
+import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.name
 
 lateinit var main: MainConfig
-lateinit var guides: GuidesConfig
 lateinit var messages: MessagesConfig
+
+val guides = mutableListOf(Guide())
 
 fun loadSettings(path: Path) {
     main = CrystalConfigs.loadConfig(path.resolve("settings.conf"), MainConfig::class.java, false)
-    guides = CrystalConfigs.loadConfig(path.resolve("guides.conf"), GuidesConfig::class.java, false)
     messages = CrystalConfigs.loadConfig(path.resolve("messages.conf"), MessagesConfig::class.java, false)
+    loadGuides(path.resolve("guides"))
 }
 
-//TODO: Fix comments in configuration
+private fun loadGuides(path: Path) {
+    if (!Files.exists(path)) Files.createDirectories(path)
+    val files = Files.list(path).use { it.toList() }
+    if (files != null && files.isNotEmpty()) {
+        files.forEach {
+            if (it != null) {
+                val config = CrystalConfigs.loadConfig(path.resolve(it.name), Guide::class.java, false)
+                guides.add(config.id(it.name.substring(0, it.name.length - 5)))
+            }
+        }
+    } else {
+        val default = Guide()
+        val loader = CrystalConfigs.hoconLoader(path.resolve("madadm.conf"))
+        val node = loader.load()
+        node.set(default)
+        loader.save(node)
+        guides.add(default)
+    }
+    LOGGER.info("Loaded ${guides.size} guide configs")
+}
 
 @ConfigSerializable
 class MainConfig {
@@ -123,11 +146,6 @@ class MainConfig {
             }
         }
     }
-}
-
-@ConfigSerializable
-class GuidesConfig {
-    val guides: List<Guide> = listOf(Guide())
 }
 
 @ConfigSerializable
