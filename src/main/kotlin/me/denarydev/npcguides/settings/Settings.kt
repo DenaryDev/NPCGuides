@@ -28,11 +28,12 @@ fun loadSettings(path: Path) {
 }
 
 private fun loadGuides(path: Path) {
+    guides.clear()
     if (!Files.exists(path)) Files.createDirectories(path)
     val files = Files.list(path).use { it.toList() }
     if (files != null && files.isNotEmpty()) {
         files.forEach {
-            if (it != null) {
+            if (it != null && it.name.endsWith(".conf")) {
                 val config = CrystalConfigs.loadConfig(path.resolve(it.name), Guide::class.java, false)
                 guides.add(config.id(it.name.substring(0, it.name.length - 5)))
             }

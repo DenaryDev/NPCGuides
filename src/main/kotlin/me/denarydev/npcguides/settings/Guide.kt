@@ -6,6 +6,7 @@ import org.bukkit.Sound
 import org.jetbrains.annotations.ApiStatus.Internal
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Comment
+import org.spongepowered.configurate.objectmapping.meta.Setting
 
 @ConfigSerializable
 class Guide {
@@ -17,6 +18,7 @@ class Guide {
         return this
     }
 
+    @Setting("a-npc-id")
     @Comment("ID NPC, к которому привязан гайд")
     val npcId: Int = 0
 
