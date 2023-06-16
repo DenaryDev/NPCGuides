@@ -79,7 +79,7 @@ class GuidesCommand : Command("guides") {
     private fun reset(sender: CommandSender, target: Player) {
         if (dataManager.exists(target.uniqueId)) {
             dataManager.resetPlayer(target.uniqueId)
-            sender.sendMessage(mm.deserialize(messages.commands.reset.sender, Placeholder.unparsed("name", sender.name)))
+            sender.sendMessage(mm.deserialize(messages.commands.reset.sender, Placeholder.unparsed("name", target.name)))
             target.sendRichMessage(messages.commands.reset.target)
         } else {
             sender.sendRichMessage(messages.errors.noData)
