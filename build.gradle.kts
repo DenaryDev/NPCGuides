@@ -42,7 +42,7 @@ kotlin {
 
 paper {
     main = "me.denarydev.npcguides.NPCGuidesPlugin"
-    loader = "me.denarydev.npcguides.internal.PluginLibrariesLoader"
+    loader = "me.denarydev.npcguides.loader.PluginLibrariesLoader"
     generateLibrariesJson = true
     author = "Me"
     apiVersion = "1.19"
@@ -91,5 +91,6 @@ tasks {
     runServer {
         minecraftVersion("1.19.4")
         runDirectory.set(project.projectDir.resolve("run/"))
+        serverJar(runDirectory.file("server.jar"))
     }
 }
