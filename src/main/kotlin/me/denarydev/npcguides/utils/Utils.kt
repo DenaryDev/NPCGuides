@@ -18,7 +18,7 @@ fun debug(s: String) {
 }
 
 fun applyPlaceholders(player: Player, text: String): String {
-    var applied = text.replace("%player_name%", player.name)
+    var applied = text.replace("{player}", player.name)
     if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
         applied = PlaceholderAPI.setPlaceholders(player, applied)
     }

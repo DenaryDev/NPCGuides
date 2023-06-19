@@ -3,7 +3,6 @@ package me.denarydev.npcguides.settings
 import me.denarydev.npcguides.LOGGER
 import org.bukkit.Particle
 import org.bukkit.Sound
-import org.jetbrains.annotations.ApiStatus.Internal
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Comment
 import org.spongepowered.configurate.objectmapping.meta.Setting
@@ -78,21 +77,18 @@ class Interaction {
         return if (this.range.endsWith("+")) {
             val i = range.replace("+", "").toInt()
             talks >= i
-        } else {
-            if (this.range.contains("-")) {
-                val split = range.split("-")
-                if (split.size == 2) {
-                    val first = split[0].toInt()
-                    val second = split[1].toInt()
-                    first..second
-                } else {
-                    LOGGER.error("Invalid range: $range")
-                    return false
-                }
+        } else if (this.range.contains("-")) {
+            val split = range.split("-")
+            if (split.size == 2) {
+                val first = split[0].toInt()
+                val second = split[1].toInt()
+                (first..second).contains(talks)
             } else {
-                val i = range.toInt()
-                i..i
-            }.contains(talks)
+                LOGGER.error("Invalid range: $range")
+                false
+            }
+        } else {
+            range.toInt() == talks
         }
     }
 }
@@ -144,7 +140,7 @@ class PermissionAction() {
 
         @Comment(
             """Список сообщений. Отправляются в том же порядке, что и в списке
-По умолчанию доступен только один заполнитель: %player_name%,
+По умолчанию доступен только один заполнитель: {player},
 но так же поддерживаются заполнители PlaceholderAPI, если он есть
 Поддерживается форматирование через MiniMessage (https://docs.advntr.dev/minimessage/format.html)"""
         )
@@ -195,7 +191,7 @@ class PermissionAction() {
 
         @Comment(
             """Список действий. Выполняется в том же порядке, что и в списке.
-По умолчанию доступен только один заполнитель: %player_name%,
+По умолчанию доступен только один заполнитель: {player},
 но так же поддерживаются заполнители PlaceholderAPI, если он есть
 Формат: <тип-действия>;<контекст>
 * player - Выполняет команду от имени игрока
@@ -209,9 +205,4 @@ class PermissionAction() {
             "message;<yellow>Действие отправки сообщения"
         )
     }
-}
-
-@Internal
-enum class PermissionActionType {
-    HAS, NO, DEFAULT
 }

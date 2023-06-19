@@ -1,4 +1,6 @@
+
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     java
@@ -19,11 +21,9 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.19.4-R0.1-SNAPSHOT")
+    compileOnly("io.sapphiremc.sapphire:sapphire-api:1.19.4-R0.1-SNAPSHOT")
     compileOnly("net.citizensnpcs:citizensapi:2.0.31-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.3")
-
-    library(kotlin("stdlib"))
 
     library("org.spongepowered:configurate-extra-kotlin:4.1.2")
 
@@ -49,7 +49,9 @@ paper {
     defaultPermission = BukkitPluginDescription.Permission.Default.OP
 
     depends {
-        register("Citizens")
+        register("Citizens") {
+            required = true
+        }
     }
 
     loadAfter {
@@ -78,6 +80,10 @@ paper {
 }
 
 tasks {
+    compileKotlin {
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
+    }
+
     processResources {
         filteringCharset = Charsets.UTF_8.name()
     }
