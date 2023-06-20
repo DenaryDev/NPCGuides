@@ -24,10 +24,8 @@ class GuideManager {
 
     private val talkingPlayers = mutableListOf<UUID>()
 
-    fun byId(id: String): Guide? {
-        return guides.stream()
-            .filter { it.id == id }
-            .findFirst().orElse(null)
+    fun hasGuide(id: String): Boolean {
+        return byId(id) != null
     }
 
     fun startTalking(player: Player, npc: NPC) {
@@ -35,8 +33,8 @@ class GuideManager {
             debug("Player ${player.name} already talking")
             return
         }
-        debug("${player.name} start talking with NPC ${npc.name}")
         val guide = byNPC(npc.id) ?: return
+        debug("${player.name} start talking with NPC ${npc.name}")
         val action = getAction(player, guide)
         if (action.chat.messages.isNotEmpty()) {
             debug("Found chat messages action, sending...")
@@ -45,9 +43,9 @@ class GuideManager {
         }
     }
 
-    fun stopTalking(player: Player, guideId: String, permission: String) {
+    fun stopTalking(player: Player, guideId: String, permission: String?) {
         talkingPlayers.remove(player.uniqueId)
-        if (player.hasPermission(permission)) dataManager.addTalk(player.uniqueId, guideId)
+        if (permission != null && player.hasPermission(permission)) dataManager.addTalk(player.uniqueId, guideId)
     }
 
     fun getAction(player: Player, guide: Guide): PermissionAction {
@@ -57,9 +55,15 @@ class GuideManager {
                 it.inRange(talks + 1)
             }
             .map {
-                (if (player.hasPermission(it.permission)) it.hasPermission else it.noPermission).permission(it.permission)
+                if (player.hasPermission(it.permission)) it.hasPermission.permission(it.permission) else it.noPermission
             }
             .findFirst().orElse(guide.default)
+    }
+
+    private fun byId(id: String): Guide? {
+        return guides.stream()
+            .filter { it.id == id }
+            .findFirst().orElse(null)
     }
 
     private fun byNPC(npcId: Int): Guide? {

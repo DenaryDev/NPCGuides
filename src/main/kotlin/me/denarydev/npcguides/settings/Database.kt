@@ -57,11 +57,11 @@ class DataConfiguration : AbstractDatabaseConfig() {
     }
 
     override fun maxPoolSize(): Short {
-        return main.database.remote.settings.maxPoolSize
+        return main.database.remote.settings.maxPoolSize.toShort()
     }
 
     override fun minimumIdle(): Short {
-        return main.database.remote.settings.minimumIdle
+        return main.database.remote.settings.minimumIdle.toShort()
     }
 
     override fun maxLifeTime(): Int {

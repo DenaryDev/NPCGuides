@@ -107,7 +107,7 @@ class PermissionAction() {
     }
 
     @Transient
-    var permission: String = ""
+    var permission: String? = null
 
     fun permission(permission: String): PermissionAction {
         this.permission = permission

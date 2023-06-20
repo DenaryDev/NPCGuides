@@ -44,8 +44,8 @@ class DataManager : AbstractDataManager() {
     }
 
     fun deletePlayer(player: Player) {
-        users.remove(player.uniqueId) ?: return
-        savePlayer(player.uniqueId)
+        val talks = users.remove(player.uniqueId) ?: return
+        savePlayer(player.uniqueId, talks)
     }
 
     fun getPlayerTalks(uuid: UUID): Map<String, Int> {
@@ -54,16 +54,23 @@ class DataManager : AbstractDataManager() {
 
     fun addTalk(uuid: UUID, guideId: String) {
         if (users.contains(uuid)) {
-            val user = users[uuid]!!
-            val current = user.getOrDefault(guideId, 0)
-            user[guideId] = (current + 1)
-            savePlayer(uuid)
+            val talks = users[uuid]!!
+            val current = talks.getOrDefault(guideId, 0)
+            talks[guideId] = (current + 1)
+            savePlayer(uuid, talks)
         }
     }
 
     fun shutdown() {
         shutdownTaskQueue()
         if (databaseConnector != null) databaseConnector.closeConnection()
+    }
+
+    fun resetPlayerGuide(uuid: UUID, guideId: String) {
+        val talks = users.remove(uuid) ?: return
+        talks.remove(guideId)
+        users[uuid] = talks
+        savePlayer(uuid, talks)
     }
 
     fun resetPlayer(uuid: UUID) {
@@ -116,15 +123,14 @@ class DataManager : AbstractDataManager() {
         }
     }
 
-    private fun savePlayer(uuid: UUID) {
+    private fun savePlayer(uuid: UUID, talks: Map<String, Int>) {
         databaseConnector.connection.use {
-            val statement = it.prepareStatement("update `$table` set `guides` = ${talksAsString(uuid)} where `uuid` = '${uuid}'")
+            val statement = it.prepareStatement("update `$table` set `guides` = ${talksToString(talks)} where `uuid` = '${uuid}'")
             statement.executeUpdate()
         }
     }
 
-    private fun talksAsString(uuid: UUID): String? {
-        val talks = users[uuid] ?: return null
+    private fun talksToString(talks: Map<String, Int>): String? {
         if (talks.isEmpty()) return null
         val builder = StringBuilder()
         talks.forEach { (guideId, amount) ->
