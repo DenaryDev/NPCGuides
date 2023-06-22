@@ -7,7 +7,7 @@
  */
 package me.denarydev.npcguides
 
-import me.denarydev.npcguides.command.GuidesCommand
+import me.denarydev.npcguides.command.registerCommands
 import me.denarydev.npcguides.data.DataManager
 import me.denarydev.npcguides.data.dataManager
 import me.denarydev.npcguides.guide.GuideManager
@@ -18,7 +18,6 @@ import me.denarydev.npcguides.settings.DataConfiguration
 import me.denarydev.npcguides.settings.loadSettings
 import me.denarydev.npcguides.settings.main
 import me.denarydev.npcguides.task.ParticlesTask
-import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import org.slf4j.Logger
 
@@ -37,7 +36,7 @@ class NPCGuidesPlugin : JavaPlugin() {
         guideManager = GuideManager()
         reload()
         ParticlesTask().runTaskTimerAsynchronously(this, main.particlesInterval, main.particlesInterval)
-        Bukkit.getCommandMap().register(this.name.lowercase(), GuidesCommand())
+        registerCommands()
         server.pluginManager.registerEvents(PlayerListener(), this)
         server.pluginManager.registerEvents(NPCListener(), this)
     }

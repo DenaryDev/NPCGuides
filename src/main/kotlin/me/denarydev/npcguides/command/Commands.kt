@@ -7,172 +7,104 @@
  */
 package me.denarydev.npcguides.command
 
+import com.mojang.brigadier.arguments.StringArgumentType.getString
+import com.mojang.brigadier.arguments.StringArgumentType.word
+import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import com.mojang.brigadier.builder.LiteralArgumentBuilder.literal
+import com.mojang.brigadier.builder.RequiredArgumentBuilder.argument
+import io.papermc.paper.adventure.PaperAdventure
 import me.denarydev.npcguides.PLUGIN
 import me.denarydev.npcguides.data.dataManager
 import me.denarydev.npcguides.guide.guideManager
 import me.denarydev.npcguides.settings.messages
-import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
+import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
+import net.minecraft.commands.CommandSourceStack
+import net.minecraft.commands.arguments.GameProfileArgument
+import net.minecraft.commands.arguments.GameProfileArgument.gameProfile
+import net.minecraft.commands.arguments.GameProfileArgument.getGameProfiles
+import net.minecraft.network.chat.Component
+import net.minecraft.server.MinecraftServer
+import net.minecraft.server.level.ServerPlayer
 import org.bukkit.Bukkit
-import org.bukkit.command.Command
-import org.bukkit.command.CommandSender
-import org.bukkit.entity.Player
+import org.bukkit.craftbukkit.v1_19_R3.CraftServer
 
-private val mm = MiniMessage.miniMessage()
+fun registerCommands() {
+    val dispatcher = (Bukkit.getServer() as CraftServer).server.commands.dispatcher
 
-class GuidesCommand : Command("guides") {
+    val cmd = dispatcher.register(guidesCommand())
+    dispatcher.register(literal<CommandSourceStack?>("guides").redirect(cmd))
+}
 
-    override fun execute(sender: CommandSender, label: String, args: Array<out String>): Boolean {
-        if (!sender.hasPermission("npcguides.reload")
-            && !sender.hasPermission("npcguides.reset")
-        //&& !sender.hasPermission("npcguides.info")
-        ) {
-            sender.sendRichMessage(messages.errors.noPerm)
-            return true
-        }
-        if (args.isEmpty()) {
-            sendHelp(sender, label)
-            return true
-        }
-
-        when (args[0]) {
-            "reload" -> {
-                if (sender.hasPermission("npcguides.reload")) {
+private fun guidesCommand(): LiteralArgumentBuilder<CommandSourceStack> {
+    return literal<CommandSourceStack?>("npcguides")
+        .then(
+            literal<CommandSourceStack?>("reload")
+                .requires {
+                    it.hasPermission(2, "npcguides.reload")
+                }
+                .executes { ctx ->
                     PLUGIN.reload()
-                    sender.sendRichMessage(messages.commands.reload.reloaded)
-                } else {
-                    sender.sendRichMessage(messages.errors.noPerm)
+                    ctx.source.sendSystemMessage(asVanilla(messages.commands.reload.reloaded))
+                    1
                 }
-            }
-
-            "reset" -> {
-                if (sender.hasPermission("npcguides.reset")) {
-                    if (args.size == 1) {
-                        if (sender is Player) {
-                            reset(sender, sender)
-                        } else {
-                            sender.sendRichMessage(messages.errors.playersOnly)
-                        }
-                    } else {
-                        val target = Bukkit.getPlayer(args[1])
-                        if (target != null) {
-                            if (args.size == 2) {
-                                reset(sender, target)
-                            } else if (args.size == 3) {
-                                if (guideManager.hasGuide(args[2])) {
-                                    reset(sender, target, args[2])
-                                } else {
-                                    sender.sendMessage(mm.deserialize(messages.errors.guideNotFound, Placeholder.unparsed("arg", args[2])))
-                                }
-                            } else {
-                                sender.sendRichMessage(messages.commands.reset.usage)
-                            }
-                        } else {
-                            sender.sendMessage(mm.deserialize(messages.errors.notFound, Placeholder.unparsed("arg", args[1])))
-                        }
-                    }
-                } else {
-                    sender.sendRichMessage(messages.errors.noPerm)
-                }
-            }
-
-            //"info" -> {
-            //    sender.sendRichMessage("Ещё не сделано! <pink>UwU")
-            //}
-
-            else -> {
-                sender.sendMessage(mm.deserialize(messages.commands.guides.usage, Placeholder.unparsed("label", label)))
-            }
-        }
-
-        return true
-    }
-
-    private fun reset(sender: CommandSender, target: Player, guideId: String? = null) {
-        if (dataManager.exists(target.uniqueId)) {
-            if (guideId != null) {
-                dataManager.resetPlayerGuide(target.uniqueId, guideId)
-            } else {
-                dataManager.resetPlayer(target.uniqueId)
-            }
-            sender.sendMessage(mm.deserialize(messages.commands.reset.sender, Placeholder.unparsed("name", target.name)))
-            target.sendRichMessage(messages.commands.reset.target)
-        } else {
-            sender.sendRichMessage(messages.errors.noData)
-        }
-    }
-
-    override fun tabComplete(sender: CommandSender, alias: String, args: Array<out String>): MutableList<String> {
-        val aliases = mutableListOf<String>()
-
-        if (args.size == 1) {
-            val arg0 = args[0]
-            if (arg0.isEmpty()) {
-                if (sender.hasPermission("npcguides.reload")) aliases.add("reload")
-                if (sender.hasPermission("npcguides.reset")) aliases.add("reset")
-            } else {
-                if ("reload".contains(arg0) && sender.hasPermission("npcguides.reload")) aliases.add("reload")
-                if ("reset".contains(arg0) && sender.hasPermission("npcguides.reset")) aliases.add("reset")
-            }
-        } else if (args.size == 2) {
-            val arg0 = args[0]
-            val arg1 = args[1]
-            if (arg1.isEmpty()) {
-                if (arg0 == "reset" && sender.hasPermission("npcguides.reset")) {
-                    Bukkit.getOnlinePlayers().forEach {
-                        aliases.add(it.name)
-                    }
-                }
-            } else {
-                if (arg0 == "reset" && sender.hasPermission("npcguides.reset")) {
-                    Bukkit.getOnlinePlayers().forEach {
-                        if (it.name.lowercase().contains(arg1)) aliases.add(it.name)
-                    }
-                }
-            }
-        }
-
-        return aliases
-    }
-
-    private fun sendHelp(sender: CommandSender, label: String) {
-        val result = mutableSetOf(mm.deserialize(messages.commands.help.header))
-        arrayOf("reload", "reset" /*"info"*/).forEach {
-            if (sender.hasPermission("npcguides.$it")) {
-                result.add(
-                    mm.deserialize(
-                        messages.commands.help.entry,
-                        Placeholder.unparsed("label", label),
-                        Placeholder.unparsed("args", args(it)),
-                        Placeholder.component("info", info(it))
-                    )
-                )
-            }
-        }
-        if (result.size == 1)
-            sender.sendRichMessage(messages.errors.noPerm)
-        else
-            result.forEach(sender::sendMessage)
-    }
-
-    private fun args(arg: String): String {
-        return when (arg) {
-            "reload" -> "reload"
-            "reset" -> "reset [player|all]"
-            //"info" -> "info [player]"
-            else -> "404 Not Found .-."
-        }
-    }
-
-    private fun info(arg: String): Component {
-        return mm.deserialize(
-            when (arg) {
-                "reload" -> messages.commands.reload.info
-                "reset" -> messages.commands.reset.info
-                //"info" -> messages.commands.info.info
-                else -> "404 Not Found .-."
-            }
         )
+        .then(
+            literal<CommandSourceStack?>("reset")
+                .requires {
+                    it.isPlayer && it.hasPermission(2, "npcguides.reset")
+                }
+                .executes { ctx ->
+                    reset(ctx.source)
+                    1
+                }
+                .then(
+                    argument<CommandSourceStack?, GameProfileArgument.Result?>("target", gameProfile())
+                        .requires {
+                            it.hasPermission(2, "npcguides.reset.other")
+                        }
+                        .executes { ctx ->
+                            getGameProfiles(ctx, "target").forEach {
+                                reset(ctx.source, MinecraftServer.getServer().playerList.getPlayer(it.id)!!)
+                            }
+                            1
+                        }
+                        .then(
+                            argument<CommandSourceStack?, String?>("guide", word())
+                                .requires {
+                                    it.hasPermission(2, "npcguides.reset.other")
+                                }
+                                .executes { ctx ->
+                                    val arg = getString(ctx, "guide")
+                                    if (guideManager.hasGuide(arg)) {
+                                        getGameProfiles(ctx, "target").forEach {
+                                            reset(ctx.source, MinecraftServer.getServer().playerList.getPlayer(it.id)!!, arg)
+                                        }
+                                    } else {
+                                        ctx.source.sendSystemMessage(asVanilla(messages.errors.guideNotFound, Placeholder.unparsed("arg", arg)))
+                                    }
+                                    1
+                                }
+                        )
+                )
+        )
+}
+
+private fun reset(sender: CommandSourceStack, target: ServerPlayer = sender.player!!, guideId: String? = null) {
+    if (dataManager.exists(target.uuid)) {
+        if (guideId != null) {
+            dataManager.resetPlayerGuide(target.uuid, guideId)
+        } else {
+            dataManager.resetPlayer(target.uuid)
+        }
+        sender.sendSystemMessage(asVanilla(messages.commands.reset.sender, Placeholder.unparsed("name", target.displayName)))
+        target.sendSystemMessage(asVanilla(messages.commands.reset.target))
+    } else {
+        sender.sendSystemMessage(asVanilla(messages.errors.noData))
     }
+}
+
+private fun asVanilla(s: String, vararg tags: TagResolver): Component {
+    return PaperAdventure.asVanilla(MiniMessage.miniMessage().deserialize(s, *tags))
 }

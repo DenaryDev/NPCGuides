@@ -7,6 +7,7 @@ plugins {
     kotlin("jvm") version "1.8.21"
     id("xyz.jpenilla.run-paper") version "2.0.1"
     id("net.minecrell.plugin-yml.paper") version "0.6.0-SNAPSHOT"
+    id("io.papermc.paperweight.userdev") version "1.5.5"
 }
 
 group = "me.example"
@@ -21,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.sapphiremc.sapphire:sapphire-api:1.19.4-R0.1-SNAPSHOT")
+    paperweight.devBundle("io.sapphiremc.sapphire", "1.19.4-R0.1-SNAPSHOT")
     compileOnly("net.citizensnpcs:citizensapi:2.0.31-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.3")
 
