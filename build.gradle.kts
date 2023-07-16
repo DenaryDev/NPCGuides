@@ -1,16 +1,15 @@
-
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
+import net.minecrell.pluginyml.paper.PaperPluginDescription
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    java
-    kotlin("jvm") version "1.8.21"
+    kotlin("jvm") version "1.9.0"
     id("xyz.jpenilla.run-paper") version "2.0.1"
-    id("net.minecrell.plugin-yml.paper") version "0.6.0-SNAPSHOT"
+    id("net.minecrell.plugin-yml.paper") version "0.6.0"
     id("io.papermc.paperweight.userdev") version "1.5.5"
 }
 
-group = "me.example"
+group = "me.rafaelka"
 version = "1.0.0"
 
 repositories {
@@ -22,8 +21,8 @@ repositories {
 }
 
 dependencies {
-    paperweight.devBundle("io.sapphiremc.sapphire", "1.19.4-R0.1-SNAPSHOT")
-    compileOnly("net.citizensnpcs:citizensapi:2.0.31-SNAPSHOT")
+    paperweight.paperDevBundle("1.20.1-R0.1-SNAPSHOT")
+    compileOnly("net.citizensnpcs:citizensapi:2.0.32-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.3")
 
     library("org.spongepowered:configurate-extra-kotlin:4.1.2")
@@ -33,37 +32,32 @@ dependencies {
     library("me.denarydev.crystal.shared:database:$crystalVersion")
 }
 
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
-}
-
 kotlin {
     jvmToolchain(17)
 }
 
 paper {
-    main = "me.denarydev.npcguides.NPCGuidesPlugin"
-    loader = "me.denarydev.npcguides.loader.PluginLibrariesLoader"
-    generateLibrariesJson = true
-    author = "Me"
-    apiVersion = "1.19"
-    defaultPermission = BukkitPluginDescription.Permission.Default.OP
+    author = "RafaelkaUwU"
 
-    depends {
+    main = "me.rafaelka.npcguides.NPCGuidesPlugin"
+    loader = "me.rafaelka.npcguides.loader.PluginLibrariesLoader"
+
+    generateLibrariesJson = true
+
+    apiVersion = "1.20"
+
+    serverDependencies {
         register("Citizens") {
             required = true
+            load = PaperPluginDescription.RelativeLoadOrder.AFTER
         }
-    }
-
-    loadAfter {
-        register("Citizens")
     }
 
     permissions {
         register("npcguides.admin") {
             description = "Admin permission"
             default = BukkitPluginDescription.Permission.Default.FALSE
-            children = listOf("npcguides.reload", "npcguides.reset", /*"npcguides.info"*/)
+            children = listOf("npcguides.reload", "npcguides.reset" /*"npcguides.info"*/)
         }
         register("npcguides.reload") {
             description = "Allows to reload plugin"
@@ -90,8 +84,8 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.19.4")
-        runDirectory.set(project.projectDir.resolve("run/"))
-        serverJar(runDirectory.file("server.jar"))
+        minecraftVersion("1.20.1")
+        val file = projectDir.resolve("run/server.jar")
+        if (file.exists()) serverJar(file)
     }
 }

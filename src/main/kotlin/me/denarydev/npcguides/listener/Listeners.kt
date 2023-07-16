@@ -20,11 +20,15 @@ class PlayerListener : Listener {
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
         dataManager.createPlayer(event.player)
+
+        guideManager.showHolograms(event.player)
     }
 
     @EventHandler
     fun onQuit(event: PlayerQuitEvent) {
         dataManager.deletePlayer(event.player)
+
+        guideManager.forceStopTalking(event.player)
     }
 }
 

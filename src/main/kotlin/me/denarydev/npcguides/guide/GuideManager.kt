@@ -16,13 +16,14 @@ import me.denarydev.npcguides.task.ChatTask
 import me.denarydev.npcguides.utils.debug
 import net.citizensnpcs.api.npc.NPC
 import org.bukkit.entity.Player
+import org.bukkit.scheduler.BukkitTask
 import java.util.UUID
 
 lateinit var guideManager: GuideManager
 
 class GuideManager {
 
-    private val talkingPlayers = mutableListOf<UUID>()
+    private val talkingPlayers = mutableMapOf<UUID, BukkitTask>()
 
     fun hasGuide(id: String): Boolean {
         return byId(id) != null
@@ -38,9 +39,13 @@ class GuideManager {
         val action = getAction(player, guide)
         if (action.chat.messages.isNotEmpty()) {
             debug("Found chat messages action, sending...")
-            ChatTask(player, guide.id, action).runTaskTimerAsynchronously(PLUGIN, 0L, action.chat.interval * 20L)
-            talkingPlayers.add(player.uniqueId)
+            val task = ChatTask(player, guide.id, action).runTaskTimerAsynchronously(PLUGIN, 0L, action.chat.interval * 20L)
+            talkingPlayers[player.uniqueId] = task
         }
+    }
+
+    fun forceStopTalking(player: Player) {
+        talkingPlayers[player.uniqueId]?.cancel()
     }
 
     fun stopTalking(player: Player, guideId: String, permission: String?) {

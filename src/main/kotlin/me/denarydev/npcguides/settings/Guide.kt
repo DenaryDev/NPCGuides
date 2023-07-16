@@ -1,6 +1,7 @@
 package me.denarydev.npcguides.settings
 
 import me.denarydev.npcguides.LOGGER
+import me.rafaelka.crystal.display.DisplayData
 import org.bukkit.Particle
 import org.bukkit.Sound
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
@@ -44,6 +45,8 @@ class Interaction {
 * 3+ - Действие будет выполняться при третьем и последующих взаимодействиях"""
     )
     val range: String = "1-3"
+
+
 
     @Comment(
         """Разрешение, необходимое для выполнения действия
@@ -91,6 +94,13 @@ class Interaction {
             range.toInt() == talks
         }
     }
+
+    data class Hologram(
+        val height: Float = 0.8f,
+        val settings: DisplayData = DisplayData(
+
+        )
+    )
 }
 
 @ConfigSerializable

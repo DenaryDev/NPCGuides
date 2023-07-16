@@ -61,25 +61,18 @@ data class ChatTask(val player: Player, val guideId: String, val action: Permiss
             cancel()
             if (action.execute.actions.isNotEmpty()) {
                 debug("Found execute action, running...")
-                ActionsTask(player, guideId, action).runTask(PLUGIN)
+                action.execute.actions.forEach {
+                    debug("Executing action $it for ${player.name}")
+                    executeAction(player, it)
+                    if (action.execute.sound) {
+                        player.playSound(player.location, action.sound.type, action.sound.volume, action.sound.pitch)
+                    }
+                }
+                guideManager.stopTalking(player, guideId, action.permission)
             } else {
                 guideManager.stopTalking(player, guideId, action.permission)
             }
         }
-    }
-}
-
-@Internal
-data class ActionsTask(val player: Player, val guideId: String, val action: PermissionAction) : BukkitRunnable() {
-    override fun run() {
-        action.execute.actions.forEach {
-            debug("Executing action $it for ${player.name}")
-            executeAction(player, it)
-            if (action.execute.sound) {
-                player.playSound(player.location, action.sound.type, action.sound.volume, action.sound.pitch)
-            }
-        }
-        guideManager.stopTalking(player, guideId, action.permission)
     }
 
     private fun executeAction(player: Player, action: String) {
