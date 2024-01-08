@@ -5,30 +5,36 @@
  * license that can be found in the LICENSE file or at
  * https://opensource.org/licenses/MIT.
  */
-package me.denarydev.npcguides.command
+package me.rafaelka.npcguides.command
 
 import com.mojang.brigadier.arguments.StringArgumentType.getString
 import com.mojang.brigadier.arguments.StringArgumentType.word
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder.literal
 import com.mojang.brigadier.builder.RequiredArgumentBuilder.argument
-import io.papermc.paper.adventure.PaperAdventure
-import me.denarydev.npcguides.PLUGIN
-import me.denarydev.npcguides.data.dataManager
-import me.denarydev.npcguides.guide.guideManager
-import me.denarydev.npcguides.settings.messages
-import net.kyori.adventure.text.minimessage.MiniMessage
+import me.rafaelka.npcguides.BUILD_TIME
+import me.rafaelka.npcguides.GIT_BRANCH
+import me.rafaelka.npcguides.GIT_COMMIT
+import me.rafaelka.npcguides.VERSION
+import me.rafaelka.npcguides.data.dataManager
+import me.rafaelka.npcguides.guide.guideManager
+import me.rafaelka.npcguides.plugin
+import me.rafaelka.npcguides.settings.messages
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.event.HoverEvent
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.TextDecoration
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.arguments.GameProfileArgument
 import net.minecraft.commands.arguments.GameProfileArgument.gameProfile
 import net.minecraft.commands.arguments.GameProfileArgument.getGameProfiles
-import net.minecraft.network.chat.Component
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 import org.bukkit.Bukkit
-import org.bukkit.craftbukkit.v1_19_R3.CraftServer
+import org.bukkit.craftbukkit.v1_20_R1.CraftServer
+import java.text.SimpleDateFormat
+import java.util.Date
 
 fun registerCommands() {
     val dispatcher = (Bukkit.getServer() as CraftServer).server.commands.dispatcher
@@ -45,8 +51,30 @@ private fun guidesCommand(): LiteralArgumentBuilder<CommandSourceStack> {
                     it.hasPermission(2, "npcguides.reload")
                 }
                 .executes { ctx ->
-                    PLUGIN.reload()
-                    ctx.source.sendSystemMessage(asVanilla(messages.commands.reload.reloaded))
+                    plugin.reload()
+                    ctx.source.bukkitSender.sendRichMessage(messages.commands.reload.reloaded)
+                    1
+                }
+        )
+        .then(
+            literal<CommandSourceStack?>("about")
+                .requires {
+                    it.hasPermission(2, "npcguides.about")
+                }
+                .executes { ctx ->
+                    val platformInfo = Component.text(Bukkit.getName()).hoverEvent(
+                        HoverEvent.showText(
+                            Component.text(Bukkit.getVersion(), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
+                        )
+                    )
+                    ctx.source.bukkitSender.sendRichMessage(
+                        messages.commands.about.success,
+                        Placeholder.unparsed("version", VERSION),
+                        Placeholder.component("platform", platformInfo),
+                        Placeholder.unparsed("author", "RafaelkaUwU (aka DenaryDev)"),
+                        Placeholder.unparsed("build_time", SimpleDateFormat("yyyy-MM-dd HH:mm:ss XX").format(Date(BUILD_TIME.toLong()))),
+                        Placeholder.unparsed("commit", GIT_COMMIT), Placeholder.unparsed("branch", GIT_BRANCH)
+                    )
                     1
                 }
         )
@@ -82,7 +110,7 @@ private fun guidesCommand(): LiteralArgumentBuilder<CommandSourceStack> {
                                             reset(ctx.source, MinecraftServer.getServer().playerList.getPlayer(it.id)!!, arg)
                                         }
                                     } else {
-                                        ctx.source.sendSystemMessage(asVanilla(messages.errors.guideNotFound, Placeholder.unparsed("arg", arg)))
+                                        ctx.source.bukkitSender.sendRichMessage(messages.errors.guideNotFound, Placeholder.unparsed("arg", arg))
                                     }
                                     1
                                 }
@@ -98,13 +126,9 @@ private fun reset(sender: CommandSourceStack, target: ServerPlayer = sender.play
         } else {
             dataManager.resetPlayer(target.uuid)
         }
-        sender.sendSystemMessage(asVanilla(messages.commands.reset.sender, Placeholder.unparsed("name", target.displayName)))
-        target.sendSystemMessage(asVanilla(messages.commands.reset.target))
+        sender.bukkitSender.sendRichMessage(messages.commands.reset.sender, Placeholder.unparsed("name", target.displayName))
+        target.bukkitEntity.sendRichMessage(messages.commands.reset.target)
     } else {
-        sender.sendSystemMessage(asVanilla(messages.errors.noData))
+        sender.bukkitSender.sendRichMessage(messages.errors.noData)
     }
-}
-
-private fun asVanilla(s: String, vararg tags: TagResolver): Component {
-    return PaperAdventure.asVanilla(MiniMessage.miniMessage().deserialize(s, *tags))
 }

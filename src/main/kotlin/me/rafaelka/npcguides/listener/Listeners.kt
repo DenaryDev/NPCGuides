@@ -5,10 +5,10 @@
  * license that can be found in the LICENSE file or at
  * https://opensource.org/licenses/MIT.
  */
-package me.denarydev.npcguides.listener
+package me.rafaelka.npcguides.listener
 
-import me.denarydev.npcguides.data.dataManager
-import me.denarydev.npcguides.guide.guideManager
+import me.rafaelka.npcguides.data.dataManager
+import me.rafaelka.npcguides.guide.guideManager
 import net.citizensnpcs.api.event.NPCRightClickEvent
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -20,8 +20,6 @@ class PlayerListener : Listener {
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
         dataManager.createPlayer(event.player)
-
-        guideManager.showHolograms(event.player)
     }
 
     @EventHandler

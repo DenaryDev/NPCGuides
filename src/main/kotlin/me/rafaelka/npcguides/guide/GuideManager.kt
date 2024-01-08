@@ -5,15 +5,15 @@
  * license that can be found in the LICENSE file or at
  * https://opensource.org/licenses/MIT.
  */
-package me.denarydev.npcguides.guide
+package me.rafaelka.npcguides.guide
 
-import me.denarydev.npcguides.PLUGIN
-import me.denarydev.npcguides.data.dataManager
-import me.denarydev.npcguides.settings.Guide
-import me.denarydev.npcguides.settings.PermissionAction
-import me.denarydev.npcguides.settings.guides
-import me.denarydev.npcguides.task.ChatTask
-import me.denarydev.npcguides.utils.debug
+import me.rafaelka.npcguides.data.dataManager
+import me.rafaelka.npcguides.plugin
+import me.rafaelka.npcguides.settings.Guide
+import me.rafaelka.npcguides.settings.PermissionAction
+import me.rafaelka.npcguides.settings.guides
+import me.rafaelka.npcguides.task.ChatTask
+import me.rafaelka.npcguides.utils.debug
 import net.citizensnpcs.api.npc.NPC
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask
@@ -39,7 +39,7 @@ class GuideManager {
         val action = getAction(player, guide)
         if (action.chat.messages.isNotEmpty()) {
             debug("Found chat messages action, sending...")
-            val task = ChatTask(player, guide.id, action).runTaskTimerAsynchronously(PLUGIN, 0L, action.chat.interval * 20L)
+            val task = ChatTask(player, guide.id, action).runTaskTimerAsynchronously(plugin, 0L, action.chat.interval * 20L)
             talkingPlayers[player.uniqueId] = task
         }
     }

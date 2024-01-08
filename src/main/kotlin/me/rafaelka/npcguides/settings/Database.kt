@@ -5,23 +5,23 @@
  * license that can be found in the LICENSE file or at
  * https://opensource.org/licenses/MIT.
  */
-package me.denarydev.npcguides.settings
+package me.rafaelka.npcguides.settings
 
 import me.denarydev.crystal.db.AbstractDatabaseConfig
 import me.denarydev.crystal.db.DatabaseType
-import me.denarydev.npcguides.LOGGER
-import me.denarydev.npcguides.PLUGIN
+import me.rafaelka.npcguides.logger
+import me.rafaelka.npcguides.plugin
 import org.bukkit.Bukkit
 import org.slf4j.Logger
 import java.io.File
 
 class DataConfiguration : AbstractDatabaseConfig() {
     override fun logger(): Logger {
-        return LOGGER
+        return logger
     }
 
     override fun runSyncTask(task: Runnable) {
-        Bukkit.getScheduler().runTask(PLUGIN, task)
+        Bukkit.getScheduler().runTask(plugin, task)
     }
 
     override fun databaseType(): DatabaseType {
@@ -29,11 +29,11 @@ class DataConfiguration : AbstractDatabaseConfig() {
     }
 
     override fun sqliteStorageFile(): File {
-        return File(PLUGIN.dataFolder, "storage.db")
+        return File(plugin.dataFolder, "storage.db")
     }
 
     override fun sqlPoolPrefix(): String {
-        return PLUGIN.name
+        return plugin.name
     }
 
     override fun address(): String {

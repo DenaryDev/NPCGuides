@@ -5,23 +5,22 @@
  * license that can be found in the LICENSE file or at
  * https://opensource.org/licenses/MIT.
  */
-package me.denarydev.npcguides.task
+package me.rafaelka.npcguides.task
 
-import me.denarydev.npcguides.PLUGIN
-import me.denarydev.npcguides.guide.guideManager
-import me.denarydev.npcguides.settings.PermissionAction
-import me.denarydev.npcguides.settings.guides
-import me.denarydev.npcguides.utils.applyPlaceholders
-import me.denarydev.npcguides.utils.debug
+import me.rafaelka.npcguides.guide.guideManager
+import me.rafaelka.npcguides.logger
+import me.rafaelka.npcguides.plugin
+import me.rafaelka.npcguides.settings.PermissionAction
+import me.rafaelka.npcguides.settings.guides
+import me.rafaelka.npcguides.utils.applyPlaceholders
+import me.rafaelka.npcguides.utils.debug
 import net.citizensnpcs.api.CitizensAPI
 import net.citizensnpcs.api.npc.NPC
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
-import org.jetbrains.annotations.ApiStatus.Internal
 
-@Internal
-class ParticlesTask : BukkitRunnable() {
+internal class ParticlesTask : BukkitRunnable() {
     override fun run() {
         val players = Bukkit.getOnlinePlayers()
         if (players.isEmpty() || guides.isEmpty()) return
@@ -30,22 +29,27 @@ class ParticlesTask : BukkitRunnable() {
             for (guide in guides) {
                 val npc = CitizensAPI.getNPCRegistry().getById(guide.npcId) ?: continue
                 val action = guideManager.getAction(player, guide)
-                if (action.particle.count > 0) ParticleTask(player, npc, action.particle).runTask(PLUGIN)
+                if (action.particle.count > 0) ParticleTask(player, npc, action.particle).runTask(plugin)
             }
-        }
-    }
-
-    private data class ParticleTask(val player: Player, val npc: NPC, val action: PermissionAction.ParticleAction) : BukkitRunnable() {
-        override fun run() {
-            val nearby = npc.storedLocation.getNearbyPlayers(25.0)
-            if (nearby.contains(player))
-                player.spawnParticle(action.type, npc.storedLocation.clone().add(0.0, npc.entity.height + action.height, 0.0), action.count, 0.05, 0.02, 0.05)
         }
     }
 }
 
-@Internal
-data class ChatTask(val player: Player, val guideId: String, val action: PermissionAction) : BukkitRunnable() {
+internal data class ParticleTask(val player: Player, val npc: NPC, val action: PermissionAction.ParticleAction) : BukkitRunnable() {
+    override fun run() {
+        val npcLocation = npc.storedLocation
+        if (npcLocation == null) {
+            logger.error("Cannot find location of npc ${npc.name} (id: ${npc.id})")
+            cancel()
+            return
+        }
+        val nearby = npc.storedLocation.getNearbyPlayers(25.0)
+        if (nearby.contains(player))
+            player.spawnParticle(action.type, npc.storedLocation.clone().add(0.0, npc.entity.height + action.height, 0.0), action.count, 0.05, 0.02, 0.05)
+    }
+}
+
+internal data class ChatTask(val player: Player, val guideId: String, val action: PermissionAction) : BukkitRunnable() {
     private var lastIndex: Int = 0
 
     override fun run() {

@@ -5,10 +5,10 @@
  * license that can be found in the LICENSE file or at
  * https://opensource.org/licenses/MIT.
  */
-package me.denarydev.npcguides.data
+package me.rafaelka.npcguides.data
 
 import me.denarydev.crystal.db.AbstractDataManager
-import me.denarydev.npcguides.utils.debug
+import me.rafaelka.npcguides.utils.debug
 import org.bukkit.entity.Player
 import java.util.UUID
 

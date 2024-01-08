@@ -3,19 +3,21 @@ import net.minecrell.pluginyml.paper.PaperPluginDescription
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
-    kotlin("jvm") version "1.9.0"
-    id("xyz.jpenilla.run-paper") version "2.0.1"
+    kotlin("jvm") version "1.9.22"
+    id("xyz.jpenilla.run-paper") version "2.2.0"
     id("net.minecrell.plugin-yml.paper") version "0.6.0"
-    id("io.papermc.paperweight.userdev") version "1.5.5"
+    id("io.papermc.paperweight.userdev") version "1.5.11"
+    id("org.ajoberstar.grgit") version "5.2.1"
+    id("net.kyori.blossom") version "2.1.0"
 }
 
 group = "me.rafaelka"
-version = "1.0.0"
+version = "1.1.0"
 
 repositories {
     mavenCentral()
     maven("https://papermc.io/repo/repository/maven-public/")
-    maven("https://the-planet.fun/repo/snapshots/")
+    maven("https://the-planet.fun/repo/public/")
     maven("https://maven.citizensnpcs.co/repo/")
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
 }
@@ -26,8 +28,9 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.11.3")
 
     library("org.spongepowered:configurate-extra-kotlin:4.1.2")
+    library(kotlin("stdlib"))
 
-    val crystalVersion = "2.0.0-SNAPSHOT"
+    val crystalVersion = "2.0.4"
     library("me.denarydev.crystal.shared:config:$crystalVersion")
     library("me.denarydev.crystal.shared:database:$crystalVersion")
 }
@@ -49,7 +52,7 @@ paper {
     serverDependencies {
         register("Citizens") {
             required = true
-            load = PaperPluginDescription.RelativeLoadOrder.AFTER
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
         }
     }
 
@@ -74,13 +77,32 @@ paper {
     }
 }
 
+sourceSets {
+    main {
+        blossom {
+            kotlinSources {
+                property("version", rootProject.version.toString())
+                property("build_time", System.currentTimeMillis().toString())
+                property("git_branch", grgit.branch.current().name)
+                property("git_commit", shortCommit())
+            }
+        }
+    }
+}
+
+fun shortCommit(): String {
+    val clean = grgit.status().isClean
+    val commit = grgit.head().abbreviatedId
+    return commit + (if (clean) "" else "-dirty")
+}
+
 tasks {
     compileKotlin {
         compilerOptions.jvmTarget.set(JvmTarget.JVM_17)
     }
 
-    processResources {
-        filteringCharset = Charsets.UTF_8.name()
+    build {
+        dependsOn(reobfJar)
     }
 
     runServer {

@@ -1,7 +1,6 @@
-package me.denarydev.npcguides.settings
+package me.rafaelka.npcguides.settings
 
-import me.denarydev.npcguides.LOGGER
-import me.rafaelka.crystal.display.DisplayData
+import me.rafaelka.npcguides.logger
 import org.bukkit.Particle
 import org.bukkit.Sound
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
@@ -46,8 +45,6 @@ class Interaction {
     )
     val range: String = "1-3"
 
-
-
     @Comment(
         """Разрешение, необходимое для выполнения действия
 Оставьте пустым, чтобы отключить"""
@@ -87,20 +84,13 @@ class Interaction {
                 val second = split[1].toInt()
                 (first..second).contains(talks)
             } else {
-                LOGGER.error("Invalid range: $range")
+                logger.error("Invalid range: $range")
                 false
             }
         } else {
             range.toInt() == talks
         }
     }
-
-    data class Hologram(
-        val height: Float = 0.8f,
-        val settings: DisplayData = DisplayData(
-
-        )
-    )
 }
 
 @ConfigSerializable
