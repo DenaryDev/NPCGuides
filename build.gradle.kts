@@ -1,6 +1,7 @@
 import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 import net.minecrell.pluginyml.paper.PaperPluginDescription
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
     kotlin("jvm") version "1.9.22"
@@ -12,7 +13,7 @@ plugins {
 }
 
 group = "me.rafaelka"
-version = "1.1.0"
+version = "1.20.2-v1"
 
 repositories {
     mavenCentral()
@@ -23,8 +24,8 @@ repositories {
 }
 
 dependencies {
-    paperweight.paperDevBundle("1.20.1-R0.1-SNAPSHOT")
-    compileOnly("net.citizensnpcs:citizensapi:2.0.32-SNAPSHOT")
+    paperweight.paperDevBundle("1.20.2-R0.1-SNAPSHOT")
+    compileOnly("net.citizensnpcs:citizensapi:2.0.33-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.11.3")
 
     library("org.spongepowered:configurate-extra-kotlin:4.1.2")
@@ -105,9 +106,18 @@ tasks {
         dependsOn(reobfJar)
     }
 
-    runServer {
-        minecraftVersion("1.20.1")
+    withType<RunServer>().configureEach {
+        minecraftVersion("1.20.2")
         val file = projectDir.resolve("run/server.jar")
         if (file.exists()) serverJar(file)
+
+        downloadPlugins {
+            // Don't download these plugins on Folia because they don't support Folia.
+            if (this@configureEach.name == "runServer") {
+                url("https://download.luckperms.net/1521/bukkit/loader/LuckPerms-Bukkit-5.4.108.jar")
+                url("https://repo.extendedclip.com/content/repositories/placeholderapi/me/clip/placeholderapi/2.11.5/placeholderapi-2.11.5.jar")
+                url("https://ci.citizensnpcs.co/job/Citizens2/3281/artifact/dist/target/Citizens-2.0.33-b3281.jar")
+            }
+        }
     }
 }

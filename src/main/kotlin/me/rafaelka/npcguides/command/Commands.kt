@@ -32,12 +32,11 @@ import net.minecraft.commands.arguments.GameProfileArgument.getGameProfiles
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 import org.bukkit.Bukkit
-import org.bukkit.craftbukkit.v1_20_R1.CraftServer
 import java.text.SimpleDateFormat
 import java.util.Date
 
 fun registerCommands() {
-    val dispatcher = (Bukkit.getServer() as CraftServer).server.commands.dispatcher
+    val dispatcher = MinecraftServer.getServer().commands.dispatcher
 
     val cmd = dispatcher.register(guidesCommand())
     dispatcher.register(literal<CommandSourceStack?>("guides").redirect(cmd))
