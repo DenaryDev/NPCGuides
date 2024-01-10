@@ -45,7 +45,14 @@ internal data class ParticleTask(val player: Player, val npc: NPC, val action: P
         }
         val nearby = npc.storedLocation.getNearbyPlayers(25.0)
         if (nearby.contains(player))
-            player.spawnParticle(action.type, npc.storedLocation.clone().add(0.0, npc.entity.height + action.height, 0.0), action.count, 0.05, 0.02, 0.05)
+            player.spawnParticle(
+                action.type,
+                npc.storedLocation.clone().add(0.0, npc.entity.height + action.height, 0.0),
+                action.count,
+                0.05,
+                0.02,
+                0.05
+            )
     }
 }
 
@@ -67,7 +74,9 @@ internal data class ChatTask(val player: Player, val guideId: String, val action
                 debug("Found execute action, running...")
                 action.execute.actions.forEach {
                     debug("Executing action $it for ${player.name}")
-                    executeAction(player, it)
+                    Bukkit.getScheduler().runTask(plugin, Runnable {
+                        executeAction(player, it)
+                    })
                     if (action.execute.sound) {
                         player.playSound(player.location, action.sound.type, action.sound.volume, action.sound.pitch)
                     }
