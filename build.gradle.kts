@@ -12,7 +12,7 @@ plugins {
     id("net.kyori.blossom") version "2.1.0"
 }
 
-group = "me.rafaelka"
+group = "me.denarydev"
 version = "1.20.2-v1"
 
 repositories {
