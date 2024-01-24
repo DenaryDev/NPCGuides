@@ -1,19 +1,19 @@
 /*
- * Copyright (c) 2023 DenaryDev
+ * Copyright (c) 2024 DenaryDev
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE file or at
  * https://opensource.org/licenses/MIT.
  */
-package me.rafaelka.npcguides.guide
+package me.denarydev.npcguides.guide
 
-import me.rafaelka.npcguides.data.dataManager
-import me.rafaelka.npcguides.plugin
-import me.rafaelka.npcguides.settings.Guide
-import me.rafaelka.npcguides.settings.PermissionAction
-import me.rafaelka.npcguides.settings.guides
-import me.rafaelka.npcguides.task.ChatTask
-import me.rafaelka.npcguides.utils.debug
+import me.denarydev.npcguides.data.dataManager
+import me.denarydev.npcguides.plugin
+import me.denarydev.npcguides.settings.Guide
+import me.denarydev.npcguides.settings.PermissionAction
+import me.denarydev.npcguides.settings.guides
+import me.denarydev.npcguides.task.ChatTask
+import me.denarydev.npcguides.utils.debug
 import net.citizensnpcs.api.npc.NPC
 import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitTask

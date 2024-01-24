@@ -1,25 +1,25 @@
 /*
- * Copyright (c) 2023 DenaryDev
+ * Copyright (c) 2024 DenaryDev
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE file or at
  * https://opensource.org/licenses/MIT.
  */
-package me.rafaelka.npcguides.command
+package me.denarydev.npcguides.command
 
 import com.mojang.brigadier.arguments.StringArgumentType.getString
 import com.mojang.brigadier.arguments.StringArgumentType.word
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder.literal
 import com.mojang.brigadier.builder.RequiredArgumentBuilder.argument
-import me.rafaelka.npcguides.BUILD_TIME
-import me.rafaelka.npcguides.GIT_BRANCH
-import me.rafaelka.npcguides.GIT_COMMIT
-import me.rafaelka.npcguides.VERSION
-import me.rafaelka.npcguides.data.dataManager
-import me.rafaelka.npcguides.guide.guideManager
-import me.rafaelka.npcguides.plugin
-import me.rafaelka.npcguides.settings.messages
+import me.denarydev.npcguides.BUILD_TIME
+import me.denarydev.npcguides.GIT_BRANCH
+import me.denarydev.npcguides.GIT_COMMIT
+import me.denarydev.npcguides.VERSION
+import me.denarydev.npcguides.data.dataManager
+import me.denarydev.npcguides.guide.guideManager
+import me.denarydev.npcguides.plugin
+import me.denarydev.npcguides.settings.messages
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.HoverEvent
 import net.kyori.adventure.text.format.NamedTextColor
@@ -70,7 +70,7 @@ private fun guidesCommand(): LiteralArgumentBuilder<CommandSourceStack> {
                         messages.commands.about.success,
                         Placeholder.unparsed("version", VERSION),
                         Placeholder.component("platform", platformInfo),
-                        Placeholder.unparsed("author", "RafaelkaUwU (aka DenaryDev)"),
+                        Placeholder.unparsed("author", "DenaryDev"),
                         Placeholder.unparsed("build_time", SimpleDateFormat("yyyy-MM-dd HH:mm:ss XX").format(Date(BUILD_TIME.toLong()))),
                         Placeholder.unparsed("commit", GIT_COMMIT), Placeholder.unparsed("branch", GIT_BRANCH)
                     )

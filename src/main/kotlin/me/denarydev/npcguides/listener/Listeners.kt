@@ -1,14 +1,14 @@
 /*
- * Copyright (c) 2023 DenaryDev
+ * Copyright (c) 2024 DenaryDev
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE file or at
  * https://opensource.org/licenses/MIT.
  */
-package me.rafaelka.npcguides.listener
+package me.denarydev.npcguides.listener
 
-import me.rafaelka.npcguides.data.dataManager
-import me.rafaelka.npcguides.guide.guideManager
+import me.denarydev.npcguides.data.dataManager
+import me.denarydev.npcguides.guide.guideManager
 import net.citizensnpcs.api.event.NPCRightClickEvent
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener

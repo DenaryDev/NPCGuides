@@ -1,16 +1,16 @@
 /*
- * Copyright (c) 2023 DenaryDev
+ * Copyright (c) 2024 DenaryDev
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE file or at
  * https://opensource.org/licenses/MIT.
  */
-package me.rafaelka.npcguides.settings
+package me.denarydev.npcguides.settings
 
 import me.denarydev.crystal.db.AbstractDatabaseConfig
 import me.denarydev.crystal.db.DatabaseType
-import me.rafaelka.npcguides.logger
-import me.rafaelka.npcguides.plugin
+import me.denarydev.npcguides.logger
+import me.denarydev.npcguides.plugin
 import org.bukkit.Bukkit
 import org.slf4j.Logger
 import java.io.File

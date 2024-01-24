@@ -1,6 +1,13 @@
-package me.rafaelka.npcguides.settings
+/*
+ * Copyright (c) 2024 DenaryDev
+ *
+ * Use of this source code is governed by an MIT-style
+ * license that can be found in the LICENSE file or at
+ * https://opensource.org/licenses/MIT.
+ */
+package me.denarydev.npcguides.settings
 
-import me.rafaelka.npcguides.logger
+import me.denarydev.npcguides.logger
 import org.bukkit.Particle
 import org.bukkit.Sound
 import org.spongepowered.configurate.objectmapping.ConfigSerializable

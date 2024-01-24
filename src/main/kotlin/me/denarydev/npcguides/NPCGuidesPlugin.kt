@@ -1,23 +1,23 @@
 /*
- * Copyright (c) 2023 DenaryDev
+ * Copyright (c) 2024 DenaryDev
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE file or at
  * https://opensource.org/licenses/MIT.
  */
-package me.rafaelka.npcguides
+package me.denarydev.npcguides
 
-import me.rafaelka.npcguides.command.registerCommands
-import me.rafaelka.npcguides.data.DataManager
-import me.rafaelka.npcguides.data.dataManager
-import me.rafaelka.npcguides.guide.GuideManager
-import me.rafaelka.npcguides.guide.guideManager
-import me.rafaelka.npcguides.listener.NPCListener
-import me.rafaelka.npcguides.listener.PlayerListener
-import me.rafaelka.npcguides.settings.DataConfiguration
-import me.rafaelka.npcguides.settings.loadSettings
-import me.rafaelka.npcguides.settings.main
-import me.rafaelka.npcguides.task.ParticlesTask
+import me.denarydev.npcguides.command.registerCommands
+import me.denarydev.npcguides.data.DataManager
+import me.denarydev.npcguides.data.dataManager
+import me.denarydev.npcguides.guide.GuideManager
+import me.denarydev.npcguides.guide.guideManager
+import me.denarydev.npcguides.listener.NPCListener
+import me.denarydev.npcguides.listener.PlayerListener
+import me.denarydev.npcguides.settings.DataConfiguration
+import me.denarydev.npcguides.settings.loadSettings
+import me.denarydev.npcguides.settings.main
+import me.denarydev.npcguides.task.ParticlesTask
 import org.bukkit.plugin.java.JavaPlugin
 import org.slf4j.Logger
 
@@ -28,7 +28,7 @@ class NPCGuidesPlugin : JavaPlugin() {
 
     override fun onLoad() {
         plugin = this
-        me.rafaelka.npcguides.logger = slF4JLogger
+        me.denarydev.npcguides.logger = slF4JLogger
     }
 
     override fun onEnable() {

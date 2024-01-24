@@ -41,10 +41,10 @@ kotlin {
 }
 
 paper {
-    author = "RafaelkaUwU"
+    author = "DenaryDev"
 
-    main = "me.rafaelka.npcguides.NPCGuidesPlugin"
-    loader = "me.rafaelka.npcguides.loader.PluginLibrariesLoader"
+    main = "me.denarydev.npcguides.NPCGuidesPlugin"
+    loader = "me.denarydev.npcguides.loader.PluginLibrariesLoader"
 
     generateLibrariesJson = true
 

@@ -1,15 +1,15 @@
 /*
- * Copyright (c) 2023 DenaryDev
+ * Copyright (c) 2024 DenaryDev
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE file or at
  * https://opensource.org/licenses/MIT.
  */
-package me.rafaelka.npcguides.settings
+package me.denarydev.npcguides.settings
 
 import me.denarydev.crystal.config.CrystalConfigs
 import me.denarydev.crystal.db.DatabaseType
-import me.rafaelka.npcguides.logger
+import me.denarydev.npcguides.logger
 import org.spongepowered.configurate.objectmapping.ConfigSerializable
 import org.spongepowered.configurate.objectmapping.meta.Comment
 import java.nio.file.Files

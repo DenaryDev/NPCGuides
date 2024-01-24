@@ -5,7 +5,7 @@
  * license that can be found in the LICENSE file or at
  * https://opensource.org/licenses/MIT.
  */
-package me.rafaelka.npcguides.loader;
+package me.denarydev.npcguides.loader;
 
 import com.google.gson.Gson;
 import io.papermc.paper.plugin.loader.PluginClasspathBuilder;
