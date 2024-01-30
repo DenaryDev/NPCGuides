@@ -7,41 +7,37 @@
  */
 package me.denarydev.npcguides.settings
 
-import me.denarydev.crystal.db.AbstractDatabaseConfig
 import me.denarydev.crystal.db.DatabaseType
+import me.denarydev.crystal.db.settings.FlatfileConnectionSettings
+import me.denarydev.crystal.db.settings.HikariConnectionSettings
 import me.denarydev.npcguides.logger
 import me.denarydev.npcguides.plugin
-import org.bukkit.Bukkit
 import org.slf4j.Logger
-import java.io.File
+import java.nio.file.Path
 
-class DataConfiguration : AbstractDatabaseConfig() {
-    override fun logger(): Logger {
-        return logger
-    }
-
-    override fun runSyncTask(task: Runnable) {
-        Bukkit.getScheduler().runTask(plugin, task)
+class DataConfiguration : HikariConnectionSettings, FlatfileConnectionSettings {
+    override fun pluginName(): String {
+        return plugin.name
     }
 
     override fun databaseType(): DatabaseType {
         return main.database.type
     }
 
-    override fun sqliteStorageFile(): File {
-        return File(plugin.dataFolder, "storage.db")
+    override fun logger(): Logger {
+        return logger
     }
 
-    override fun sqlPoolPrefix(): String {
-        return plugin.name
+    override fun dataFolder(): Path {
+        return plugin.dataFolder.toPath()
     }
 
     override fun address(): String {
         return main.database.remote.connection.address
     }
 
-    override fun port(): Int {
-        return main.database.remote.connection.port
+    override fun port(): String {
+        return main.database.remote.connection.port.toString()
     }
 
     override fun database(): String {
@@ -56,15 +52,15 @@ class DataConfiguration : AbstractDatabaseConfig() {
         return main.database.remote.credentials.password
     }
 
-    override fun maxPoolSize(): Short {
-        return main.database.remote.settings.maxPoolSize.toShort()
+    override fun maxPoolSize(): Int {
+        return main.database.remote.settings.maxPoolSize
     }
 
-    override fun minimumIdle(): Short {
-        return main.database.remote.settings.minimumIdle.toShort()
+    override fun minimumIdle(): Int {
+        return main.database.remote.settings.minimumIdle
     }
 
-    override fun maxLifeTime(): Int {
+    override fun maxLifetime(): Int {
         return main.database.remote.settings.maxLifeTime
     }
 

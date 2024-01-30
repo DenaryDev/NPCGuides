@@ -19,12 +19,12 @@ class PlayerListener : Listener {
 
     @EventHandler
     fun onJoin(event: PlayerJoinEvent) {
-        dataManager.createPlayer(event.player)
+        dataManager.loadPlayer(event.player.uniqueId, event.player.name)
     }
 
     @EventHandler
     fun onQuit(event: PlayerQuitEvent) {
-        dataManager.deletePlayer(event.player)
+        dataManager.unloadPlayer(event.player)
 
         guideManager.forceStopTalking(event.player)
     }

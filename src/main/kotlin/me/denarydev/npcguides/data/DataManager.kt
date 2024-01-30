@@ -7,22 +7,29 @@
  */
 package me.denarydev.npcguides.data
 
-import me.denarydev.crystal.db.AbstractDataManager
+import me.denarydev.crystal.db.DatabaseManager
+import me.denarydev.crystal.db.connection.ConnectionFactory
+import me.denarydev.crystal.db.settings.ConnectionSettings
+import me.denarydev.npcguides.logger
+import me.denarydev.npcguides.plugin
 import me.denarydev.npcguides.utils.debug
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import java.util.UUID
 
 lateinit var dataManager: DataManager
 
-class DataManager : AbstractDataManager() {
-
+class DataManager {
     private val table = "guides_users"
-
     private val users = mutableMapOf<UUID, MutableMap<String, Int>>()
+    private val databaseManager: DatabaseManager = DatabaseManager()
+    private lateinit var connectionFactory: ConnectionFactory
 
-    override fun onDatabaseLoad() {
-        runAsync {
-            databaseConnector.connection.use {
+    fun load(connectionSettings: ConnectionSettings) {
+        databaseManager.initialize(connectionSettings)
+        this.connectionFactory = databaseManager.connectionFactory()
+        Bukkit.getAsyncScheduler().runNow(plugin) { _ ->
+            connectionFactory.connect {
                 val statement = it.prepareStatement(
                     """
                     create table if not exists `$table` (
@@ -37,18 +44,24 @@ class DataManager : AbstractDataManager() {
         }
     }
 
-    fun createPlayer(player: Player) {
-        runAsync {
-            users[player.uniqueId] = getPlayerTalks(player)
+    fun shutdown() {
+        databaseManager.shutdown()
+    }
+
+    fun loadPlayer(uuid: UUID, name: String) {
+        Bukkit.getAsyncScheduler().runNow(plugin) { _ ->
+            users[uuid] = talksFromDatabase(uuid, name)
         }
     }
 
-    fun deletePlayer(player: Player) {
+    fun unloadPlayer(player: Player) {
         val talks = users.remove(player.uniqueId) ?: return
-        savePlayer(player.uniqueId, talks)
+        Bukkit.getAsyncScheduler().runNow(plugin) { _ ->
+            savePlayer(player.uniqueId, talks)
+        }
     }
 
-    fun getPlayerTalks(uuid: UUID): Map<String, Int> {
+    fun playerTalks(uuid: UUID): Map<String, Int> {
         return users.getOrDefault(uuid, mutableMapOf())
     }
 
@@ -57,13 +70,10 @@ class DataManager : AbstractDataManager() {
             val talks = users[uuid]!!
             val current = talks.getOrDefault(guideId, 0)
             talks[guideId] = (current + 1)
-            savePlayer(uuid, talks)
+            Bukkit.getAsyncScheduler().runNow(plugin) { _ ->
+                savePlayer(uuid, talks)
+            }
         }
-    }
-
-    fun shutdown() {
-        shutdownTaskQueue()
-        if (databaseConnector != null) databaseConnector.closeConnection()
     }
 
     fun resetPlayerGuide(uuid: UUID, guideId: String) {
@@ -74,7 +84,8 @@ class DataManager : AbstractDataManager() {
     }
 
     fun resetPlayer(uuid: UUID) {
-        databaseConnector.connection.use {
+        if (primaryThread()) return
+        connectionFactory.connect {
             val statement = it.prepareStatement("update `$table` set `guides` = null where `uuid` = '$uuid'")
             statement.executeUpdate()
             users[uuid] = mutableMapOf()
@@ -82,18 +93,21 @@ class DataManager : AbstractDataManager() {
     }
 
     fun exists(uuid: UUID): Boolean {
-        databaseConnector.connection.use {
+        if (primaryThread()) return false
+        debug("Checking if player $uuid exists in database...")
+        connectionFactory.connection().use {
             val statement = it.prepareStatement("select `name` from `$table` where `uuid` = '$uuid';")
             val result = statement.executeQuery()
             return result.next()
         }
     }
 
-    private fun getPlayerTalks(player: Player): MutableMap<String, Int> {
-        debug("Getting ${player.name} talks from database...")
-        databaseConnector.connection.use {
-            if (exists(player.uniqueId)) {
-                val statement = it.prepareStatement("select `guides` from `$table` where `uuid` = '${player.uniqueId}';")
+    private fun talksFromDatabase(uuid: UUID, name: String): MutableMap<String, Int> {
+        if (primaryThread()) return mutableMapOf()
+        debug("Getting $name talks from database...")
+        connectionFactory.connection().use {
+            if (exists(uuid)) {
+                val statement = it.prepareStatement("select `guides` from `$table` where `uuid` = '$uuid';")
                 val result = statement.executeQuery()
                 if (result.next()) {
                     val s = result.getString("guides")
@@ -116,7 +130,8 @@ class DataManager : AbstractDataManager() {
                     }
                 }
             } else {
-                val statement = it.prepareStatement("insert into `$table` (`uuid`, `name`) values ('${player.uniqueId}', '${player.name}');")
+                debug("Player $name not found in database, creating...")
+                val statement = it.prepareStatement("insert into `$table` (`uuid`, `name`) values ('$uuid', '$name');")
                 statement.executeUpdate()
             }
             return mutableMapOf()
@@ -124,7 +139,8 @@ class DataManager : AbstractDataManager() {
     }
 
     private fun savePlayer(uuid: UUID, talks: Map<String, Int>) {
-        databaseConnector.connection.use {
+        if (primaryThread()) return
+        connectionFactory.connect {
             val statement = it.prepareStatement("update `$table` set `guides` = ${talksToString(talks)} where `uuid` = '${uuid}'")
             statement.executeUpdate()
         }
@@ -138,5 +154,13 @@ class DataManager : AbstractDataManager() {
             builder.append(guideId).append("-").append(amount)
         }
         return "'$builder'"
+    }
+
+    private fun primaryThread(): Boolean {
+        if (Bukkit.isPrimaryThread()) {
+            logger.error("Database access from main thread not allowed")
+            return true
+        }
+        return false
     }
 }

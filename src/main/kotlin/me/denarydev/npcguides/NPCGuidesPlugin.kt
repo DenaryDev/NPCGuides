@@ -50,7 +50,7 @@ class NPCGuidesPlugin : JavaPlugin() {
 
     fun reload() {
         loadSettings(dataFolder.toPath())
-        dataManager.loadDatabase(DataConfiguration())
+        dataManager.load(DataConfiguration())
     }
 
     override fun onDisable() {

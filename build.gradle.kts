@@ -31,7 +31,7 @@ dependencies {
     library("org.spongepowered:configurate-extra-kotlin:4.1.2")
     library(kotlin("stdlib"))
 
-    val crystalVersion = "2.0.4"
+    val crystalVersion = "2.1.1-SNAPSHOT"
     library("me.denarydev.crystal.shared:config:$crystalVersion")
     library("me.denarydev.crystal.shared:database:$crystalVersion")
 }

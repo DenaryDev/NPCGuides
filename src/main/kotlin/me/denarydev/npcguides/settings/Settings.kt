@@ -62,7 +62,7 @@ class MainConfig {
 
     @ConfigSerializable
     class Database {
-        @Comment("Тип базы данных. Доступно: SQLITE, MYSQL")
+        @Comment("Тип базы данных. Доступно: H2, SQLITE, MYSQL, MARIADB")
         val type = DatabaseType.SQLITE
 
         @Comment("Настройки удалённого подключения (для MySQL)")
@@ -159,50 +159,53 @@ class MessagesConfig {
 
     @ConfigSerializable
     class Errors {
-        //val notFound = "<red>Игрок <arg> не найден."
+        val notFound = "<red>Игрок <arg> не найден."
         val guideNotFound = "<red>Гайд <arg> не найден."
-        //val playersOnly = "<red>Эту команду могут использовать только игроки."
-        //val noPerm = "<red>У вас недостаточно прав, чтобы использовать эту команду."
+        val playersOnly = "<red>Эту команду могут использовать только игроки."
+        val noPerm = "<red>У вас недостаточно прав, чтобы использовать эту команду."
         val noData = "<red>Данные о игроке не найдены"
     }
 
     @ConfigSerializable
     class Commands {
-        //val guides = Guides()
-        //val help = Help()
+        val guides = Guides()
+        val help = Help()
         val reset = Reset()
         val reload = Reload()
         val about = About()
         //val info = Info()
 
-        //@ConfigSerializable
-        //class Guides {
-        //    val usage = "<red>Используйте /<label> help для просмотра списка доступных команд"
-        //}
+        @ConfigSerializable
+        class Guides {
+            val usage = "<red>Используйте /<label> help для просмотра списка доступных команд"
+        }
 
-        //@ConfigSerializable
-        //class Help {
-        //    val header = "<rainbow><b>NPCGuides</b></rainbow> <yellow>доступные команды:"
-        //    val entry = "<dark_gray><b>*</b> <gold>/<label> <args> <gray>- <yellow><info><reset>"
-        //}
+        @ConfigSerializable
+        class Help {
+            val header = "\"<yellow>[Система] <gray>Гайды: <white>Доступные команды:"
+            val entry = "<dark_gray><b>*</b> <yellow>/<label> <command> <gray>- <white><info>"
+        }
 
         @ConfigSerializable
         class Reset {
-            //val info = "<i>Удаляет данные игрока или всех игроков"
-            //val usage = "<red>Использование: /<label> reset [player|all]"
+            val info = "<i>Удаляет данные игрока или всех игроков"
+            val usage = "<red>Использование: /<label> reset [player|all]"
             val target = "<yellow>[Система] <gray>Гайды: <white>Ваши данные были удалены из базы данных, вы можете снова проходить гайды."
-            //val all = "<yellow>[Система] <gray>Гайды: <white>Данные всех игроков удалены из базы данных, они могут снова проходить гайды."
+            val all = "<yellow>[Система] <gray>Гайды: <white>Данные всех игроков удалены из базы данных, они могут снова проходить гайды."
             val sender = "<yellow>[Система] <gray>Гайды: <white>Данные игрока <name> удалены, он может снова проходить гайды."
         }
 
         @ConfigSerializable
         class Reload {
-            //val info = "<i>Перезагружает конфигурацию плагина"
+            val info = "<i>Перезагружает конфигурацию плагина"
+            val usage = "<red>Использование: /<label> reload"
             val reloaded = "<yellow>[Система] <gray>Гайды: <white>Конфигурация плагина успешно перезагружена."
         }
 
         @ConfigSerializable
         class About {
+            val info = "<i>Показывает информацию о плагине"
+            val usage = "<red>Использование: /<label> about"
             val success = """
             <yellow>[Система] <gray>Гайды: <white>Информация о плагине:
             <white>Версия: <yellow><version>

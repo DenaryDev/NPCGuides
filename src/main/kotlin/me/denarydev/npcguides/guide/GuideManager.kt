@@ -54,7 +54,7 @@ class GuideManager {
     }
 
     fun getAction(player: Player, guide: Guide): PermissionAction {
-        val talks = dataManager.getPlayerTalks(player.uniqueId)[guide.id] ?: 0
+        val talks = dataManager.playerTalks(player.uniqueId)[guide.id] ?: 0
         return guide.interactions.stream()
             .filter {
                 it.inRange(talks + 1)

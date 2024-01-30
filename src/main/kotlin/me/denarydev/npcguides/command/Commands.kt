@@ -119,15 +119,18 @@ private fun guidesCommand(): LiteralArgumentBuilder<CommandSourceStack> {
 }
 
 private fun reset(sender: CommandSourceStack, target: ServerPlayer = sender.player!!, guideId: String? = null) {
-    if (dataManager.exists(target.uuid)) {
-        if (guideId != null) {
-            dataManager.resetPlayerGuide(target.uuid, guideId)
+    Bukkit.getAsyncScheduler().runNow(plugin) {
+        if (dataManager.exists(target.uuid)) {
+            if (guideId != null) {
+                dataManager.resetPlayerGuide(target.uuid, guideId)
+            } else {
+                dataManager.resetPlayer(target.uuid)
+            }
+            target.bukkitEntity.sendRichMessage(messages.commands.reset.target)
+            if (sender.isPlayer && sender.player!!.uuid == target.uuid) return@runNow
+            sender.bukkitSender.sendRichMessage(messages.commands.reset.sender, Placeholder.unparsed("name", target.displayName))
         } else {
-            dataManager.resetPlayer(target.uuid)
+            sender.bukkitSender.sendRichMessage(messages.errors.noData)
         }
-        sender.bukkitSender.sendRichMessage(messages.commands.reset.sender, Placeholder.unparsed("name", target.displayName))
-        target.bukkitEntity.sendRichMessage(messages.commands.reset.target)
-    } else {
-        sender.bukkitSender.sendRichMessage(messages.errors.noData)
     }
 }
