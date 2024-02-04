@@ -12,6 +12,7 @@ import com.mojang.brigadier.arguments.StringArgumentType.word
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder.literal
 import com.mojang.brigadier.builder.RequiredArgumentBuilder.argument
+import com.mojang.brigadier.tree.CommandNode
 import me.denarydev.npcguides.BUILD_TIME
 import me.denarydev.npcguides.GIT_BRANCH
 import me.denarydev.npcguides.GIT_COMMIT
@@ -32,14 +33,21 @@ import net.minecraft.commands.arguments.GameProfileArgument.getGameProfiles
 import net.minecraft.server.MinecraftServer
 import net.minecraft.server.level.ServerPlayer
 import org.bukkit.Bukkit
+import org.bukkit.craftbukkit.v1_20_R2.command.VanillaCommandWrapper
 import java.text.SimpleDateFormat
 import java.util.Date
 
 fun registerCommands() {
-    val dispatcher = MinecraftServer.getServer().commands.dispatcher
+    val cmd = registerBrigadierCommand(guidesCommand())
+    registerBrigadierCommand(literal<CommandSourceStack?>("guides").redirect(cmd))
+}
 
-    val cmd = dispatcher.register(guidesCommand())
-    dispatcher.register(literal<CommandSourceStack?>("guides").redirect(cmd))
+private fun registerBrigadierCommand(builder: LiteralArgumentBuilder<CommandSourceStack>): CommandNode<CommandSourceStack> {
+    val nmsCommands = MinecraftServer.getServer().commands
+    val command = nmsCommands.dispatcher.register(builder)
+    val wrapper = VanillaCommandWrapper(nmsCommands, command)
+    Bukkit.getServer().commandMap.register(plugin.name.lowercase(), wrapper)
+    return command
 }
 
 private fun guidesCommand(): LiteralArgumentBuilder<CommandSourceStack> {
