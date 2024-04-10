@@ -4,11 +4,11 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import xyz.jpenilla.runpaper.task.RunServer
 
 plugins {
-    kotlin("jvm") version "1.9.22"
-    id("xyz.jpenilla.run-paper") version "2.2.0"
+    kotlin("jvm") version "1.9.23"
+    id("xyz.jpenilla.run-paper") version "2.2.3"
     id("net.minecrell.plugin-yml.paper") version "0.6.0"
-    id("io.papermc.paperweight.userdev") version "1.5.11"
-    id("org.ajoberstar.grgit") version "5.2.1"
+    id("io.papermc.paperweight.userdev") version "1.5.13"
+    id("org.ajoberstar.grgit") version "5.2.2"
     id("net.kyori.blossom") version "2.1.0"
 }
 
@@ -26,12 +26,12 @@ repositories {
 dependencies {
     paperweight.paperDevBundle("1.20.2-R0.1-SNAPSHOT")
     compileOnly("net.citizensnpcs:citizensapi:2.0.33-SNAPSHOT")
-    compileOnly("me.clip:placeholderapi:2.11.3")
+    compileOnly("me.clip:placeholderapi:2.11.5")
 
     library("org.spongepowered:configurate-extra-kotlin:4.1.2")
     library(kotlin("stdlib"))
 
-    val crystalVersion = "2.1.1-SNAPSHOT"
+    val crystalVersion = "2.1.1"
     library("me.denarydev.crystal.shared:config:$crystalVersion")
     library("me.denarydev.crystal.shared:database:$crystalVersion")
 }
