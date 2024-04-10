@@ -18,7 +18,7 @@ version = "1.20.2-v1"
 repositories {
     mavenCentral()
     maven("https://papermc.io/repo/repository/maven-public/")
-    maven("https://the-planet.fun/repo/public/")
+    maven("https://repo.activmine.ru/public/")
     maven("https://maven.citizensnpcs.co/repo/")
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
 }
