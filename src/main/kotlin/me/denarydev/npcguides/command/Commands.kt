@@ -12,7 +12,6 @@ import com.mojang.brigadier.arguments.StringArgumentType.word
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.builder.LiteralArgumentBuilder.literal
 import com.mojang.brigadier.builder.RequiredArgumentBuilder.argument
-import com.mojang.brigadier.tree.CommandNode
 import me.denarydev.npcguides.BUILD_TIME
 import me.denarydev.npcguides.GIT_BRANCH
 import me.denarydev.npcguides.GIT_COMMIT
@@ -38,93 +37,84 @@ import java.text.SimpleDateFormat
 import java.util.Date
 
 fun registerCommands() {
-    val cmd = registerBrigadierCommand(guidesCommand())
-    registerBrigadierCommand(literal<CommandSourceStack?>("guides").redirect(cmd))
-}
-
-private fun registerBrigadierCommand(builder: LiteralArgumentBuilder<CommandSourceStack>): CommandNode<CommandSourceStack> {
-    val nmsCommands = MinecraftServer.getServer().commands
-    val command = nmsCommands.dispatcher.register(builder)
-    val wrapper = VanillaCommandWrapper(nmsCommands, command)
+    val wrapper = VanillaCommandWrapper(MinecraftServer.getServer().commands, guidesCommandBuilder().build())
+    wrapper.aliases = listOf("guides")
     Bukkit.getServer().commandMap.register(plugin.name.lowercase(), wrapper)
-    return command
 }
 
-private fun guidesCommand(): LiteralArgumentBuilder<CommandSourceStack> {
-    return literal<CommandSourceStack?>("npcguides")
-        .then(
-            literal<CommandSourceStack?>("reload")
-                .requires {
-                    it.hasPermission(2, "npcguides.reload")
-                }
-                .executes { ctx ->
-                    plugin.reload()
-                    ctx.source.bukkitSender.sendRichMessage(messages.commands.reload.reloaded)
-                    1
-                }
-        )
-        .then(
-            literal<CommandSourceStack?>("about")
-                .requires {
-                    it.hasPermission(2, "npcguides.about")
-                }
-                .executes { ctx ->
-                    val platformInfo = Component.text(Bukkit.getName()).hoverEvent(
-                        HoverEvent.showText(
-                            Component.text(Bukkit.getVersion(), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
-                        )
+private fun guidesCommandBuilder(): LiteralArgumentBuilder<CommandSourceStack> = literal<CommandSourceStack?>("npcguides")
+    .then(
+        literal<CommandSourceStack?>("reload")
+            .requires {
+                it.hasPermission(2, "npcguides.reload")
+            }
+            .executes { ctx ->
+                plugin.reload()
+                ctx.source.bukkitSender.sendRichMessage(messages.commands.reload.reloaded)
+                1
+            }
+    )
+    .then(
+        literal<CommandSourceStack?>("about")
+            .requires {
+                it.hasPermission(2, "npcguides.about")
+            }
+            .executes { ctx ->
+                val platformInfo = Component.text(Bukkit.getName()).hoverEvent(
+                    HoverEvent.showText(
+                        Component.text(Bukkit.getVersion(), NamedTextColor.GRAY).decoration(TextDecoration.ITALIC, false)
                     )
-                    ctx.source.bukkitSender.sendRichMessage(
-                        messages.commands.about.success,
-                        Placeholder.unparsed("version", VERSION),
-                        Placeholder.component("platform", platformInfo),
-                        Placeholder.unparsed("author", "DenaryDev"),
-                        Placeholder.unparsed("build_time", SimpleDateFormat("yyyy-MM-dd HH:mm:ss XX").format(Date(BUILD_TIME.toLong()))),
-                        Placeholder.unparsed("commit", GIT_COMMIT), Placeholder.unparsed("branch", GIT_BRANCH)
-                    )
-                    1
-                }
-        )
-        .then(
-            literal<CommandSourceStack?>("reset")
-                .requires {
-                    it.isPlayer && it.hasPermission(2, "npcguides.reset")
-                }
-                .executes { ctx ->
-                    reset(ctx.source)
-                    1
-                }
-                .then(
-                    argument<CommandSourceStack?, GameProfileArgument.Result?>("target", gameProfile())
-                        .requires {
-                            it.hasPermission(2, "npcguides.reset.other")
-                        }
-                        .executes { ctx ->
-                            getGameProfiles(ctx, "target").forEach {
-                                reset(ctx.source, MinecraftServer.getServer().playerList.getPlayer(it.id)!!)
-                            }
-                            1
-                        }
-                        .then(
-                            argument<CommandSourceStack?, String?>("guide", word())
-                                .requires {
-                                    it.hasPermission(2, "npcguides.reset.other")
-                                }
-                                .executes { ctx ->
-                                    val arg = getString(ctx, "guide")
-                                    if (guideManager.hasGuide(arg)) {
-                                        getGameProfiles(ctx, "target").forEach {
-                                            reset(ctx.source, MinecraftServer.getServer().playerList.getPlayer(it.id)!!, arg)
-                                        }
-                                    } else {
-                                        ctx.source.bukkitSender.sendRichMessage(messages.errors.guideNotFound, Placeholder.unparsed("arg", arg))
-                                    }
-                                    1
-                                }
-                        )
                 )
-        )
-}
+                ctx.source.bukkitSender.sendRichMessage(
+                    messages.commands.about.success,
+                    Placeholder.unparsed("version", VERSION),
+                    Placeholder.component("platform", platformInfo),
+                    Placeholder.unparsed("author", "DenaryDev"),
+                    Placeholder.unparsed("build_time", SimpleDateFormat("yyyy-MM-dd HH:mm:ss XX").format(Date(BUILD_TIME.toLong()))),
+                    Placeholder.unparsed("commit", GIT_COMMIT), Placeholder.unparsed("branch", GIT_BRANCH)
+                )
+                1
+            }
+    )
+    .then(
+        literal<CommandSourceStack?>("reset")
+            .requires {
+                it.isPlayer && it.hasPermission(2, "npcguides.reset")
+            }
+            .executes { ctx ->
+                reset(ctx.source)
+                1
+            }
+            .then(
+                argument<CommandSourceStack?, GameProfileArgument.Result?>("target", gameProfile())
+                    .requires {
+                        it.hasPermission(2, "npcguides.reset.other")
+                    }
+                    .executes { ctx ->
+                        getGameProfiles(ctx, "target").forEach {
+                            reset(ctx.source, MinecraftServer.getServer().playerList.getPlayer(it.id)!!)
+                        }
+                        1
+                    }
+                    .then(
+                        argument<CommandSourceStack?, String?>("guide", word())
+                            .requires {
+                                it.hasPermission(2, "npcguides.reset.other")
+                            }
+                            .executes { ctx ->
+                                val arg = getString(ctx, "guide")
+                                if (guideManager.hasGuide(arg)) {
+                                    getGameProfiles(ctx, "target").forEach {
+                                        reset(ctx.source, MinecraftServer.getServer().playerList.getPlayer(it.id)!!, arg)
+                                    }
+                                } else {
+                                    ctx.source.bukkitSender.sendRichMessage(messages.errors.guideNotFound, Placeholder.unparsed("arg", arg))
+                                }
+                                1
+                            }
+                    )
+            )
+    )
 
 private fun reset(sender: CommandSourceStack, target: ServerPlayer = sender.player!!, guideId: String? = null) {
     Bukkit.getAsyncScheduler().runNow(plugin) {
